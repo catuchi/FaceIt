@@ -3,3 +3,4 @@
  */
 
 export * from './geocoding';
+export * from './location';

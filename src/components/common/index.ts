@@ -7,3 +7,6 @@ export type { LoadingProps } from './Loading';
 
 export { ErrorMessage } from './ErrorMessage';
 export type { ErrorMessageProps, ErrorType } from './ErrorMessage';
+
+export { LocationPermissionModal } from './LocationPermissionModal';
+export type { LocationPermissionModalProps } from './LocationPermissionModal';

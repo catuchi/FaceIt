@@ -4,9 +4,9 @@
  */
 
 /**
- * Geographic coordinates
+ * Geographic coordinates (simple version for geocoding)
  */
-export interface Coordinates {
+export interface GeoCoordinates {
   latitude: number;
   longitude: number;
 }
@@ -18,12 +18,12 @@ export interface GeocodingResult {
   id: string;
   name: string;
   address: string;
-  coordinates: Coordinates;
+  coordinates: GeoCoordinates;
   region?: string;
   country?: string;
   viewport?: {
-    northeast: Coordinates;
-    southwest: Coordinates;
+    northeast: GeoCoordinates;
+    southwest: GeoCoordinates;
   };
 }
 
