@@ -1,0 +1,93 @@
+# iOS Fastlane Configuration
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    # Increment build number
+    increment_build_number(xcodeproj: "FaceItTemp.xcodeproj")
+
+    # Build the app
+    build_app(
+      workspace: "FaceItTemp.xcworkspace",
+      scheme: "FaceItTemp",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "com.faceit.app" => "match AppStore com.faceit.app"
+        }
+      }
+    )
+
+    # Upload to TestFlight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      skip_submission: true
+    )
+
+    # Post to Slack (optional)
+    # slack(
+    #   message: "Successfully uploaded FaceIt beta build to TestFlight! 🚀",
+    #   channel: "#releases"
+    # )
+  end
+
+  desc "Push a new production build to App Store"
+  lane :release do
+    # Ensure we're on main branch
+    ensure_git_branch(branch: 'main')
+
+    # Increment version number
+    increment_version_number(
+      bump_type: "patch" # or "minor" or "major"
+    )
+
+    # Increment build number
+    increment_build_number(xcodeproj: "FaceItTemp.xcodeproj")
+
+    # Build the app
+    build_app(
+      workspace: "FaceItTemp.xcworkspace",
+      scheme: "FaceItTemp",
+      export_method: "app-store"
+    )
+
+    # Upload to App Store
+    upload_to_app_store(
+      force: true,
+      skip_metadata: true,
+      skip_screenshots: true,
+      submit_for_review: false
+    )
+
+    # Commit version bump
+    commit_version_bump(
+      message: "Version Bump by fastlane",
+      xcodeproj: "FaceItTemp.xcodeproj"
+    )
+
+    # Tag release
+    add_git_tag
+    push_to_git_remote
+  end
+
+  desc "Run tests"
+  lane :test do
+    run_tests(
+      workspace: "FaceItTemp.xcworkspace",
+      scheme: "FaceItTemp",
+      devices: ["iPhone 15 Pro"]
+    )
+  end
+
+  desc "Build for development"
+  lane :dev do
+    build_app(
+      workspace: "FaceItTemp.xcworkspace",
+      scheme: "FaceItTemp",
+      export_method: "development",
+      skip_codesigning: true
+    )
+  end
+end

@@ -1,0 +1,16 @@
+# iOS Fastlane Appfile
+
+# Your Apple ID email
+# apple_id ENV["APPLE_ID"]
+
+# Bundle identifier
+app_identifier("com.faceit.app") # Update this to your actual bundle ID
+
+# Apple Team ID
+# team_id ENV["APPLE_TEAM_ID"]
+
+# iTunes Connect Team ID (if different from team_id)
+# itunes_connect_team_id ENV["ITUNES_CONNECT_TEAM_ID"]
+
+# For more information about the Appfile, see:
+# https://docs.fastlane.tools/advanced/#appfile

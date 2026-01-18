@@ -1,0 +1,13 @@
+# Android Fastlane Appfile
+
+# Package name
+package_name("com.faceittemp") # Update this to match your actual package name
+
+# Google Play Console JSON key file path
+# json_key_file("path/to/your/google-play-service-account.json")
+
+# Or use environment variable
+# json_key_file(ENV["PLAY_STORE_JSON_KEY"])
+
+# For more information about the Appfile, see:
+# https://docs.fastlane.tools/advanced/#appfile
