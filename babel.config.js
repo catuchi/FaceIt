@@ -13,6 +13,7 @@ module.exports = {
           '@hooks': './src/hooks',
           '@utils': './src/utils',
           '@types': './src/types',
+          '@shared': './src/shared',
           '@constants': './src/constants',
           '@contexts': './src/contexts',
           '@navigation': './src/navigation',

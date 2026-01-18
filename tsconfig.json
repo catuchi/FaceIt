@@ -11,6 +11,7 @@
       "@hooks/*": ["hooks/*"],
       "@utils/*": ["utils/*"],
       "@types/*": ["types/*"],
+      "@shared/*": ["shared/*"],
       "@constants/*": ["constants/*"],
       "@contexts/*": ["contexts/*"],
       "@navigation/*": ["navigation/*"],
