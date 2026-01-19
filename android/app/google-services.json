@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "920428763722",
+    "project_id": "faceit-3556c",
+    "storage_bucket": "faceit-3556c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:920428763722:android:a2697345a32ab6ac0724b3",
+        "android_client_info": {
+          "package_name": "com.faceittemp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSJF4puO3lDVFb9zwQVACe8QQ3iCNgB4k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

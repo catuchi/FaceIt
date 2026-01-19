@@ -21,6 +21,7 @@ import { GeocodingService } from '../../services/geocoding/GeocodingService';
 import { storageService } from '../../services/storage';
 import { GeocodingResult } from '../../types/geocoding';
 import { Location } from '../../types/storage';
+import { Analytics, ScreenNames } from '../../utils';
 
 type Props = ScreenProps<'SearchResults'>;
 
@@ -33,6 +34,7 @@ export const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
   const geocodingService = new GeocodingService();
 
   useEffect(() => {
+    Analytics.logScreenView(ScreenNames.SEARCH_RESULTS);
     fetchResults();
   }, [query]);
 
@@ -42,9 +44,12 @@ export const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
       setError(null);
       const searchResults = await geocodingService.searchByText(query);
       setResults(searchResults);
+      Analytics.logSearchSuccess({ query, resultCount: searchResults.length });
     } catch (err: any) {
       console.error('[SearchResultsScreen] Search failed:', err);
-      setError(err.message || 'Failed to search for locations. Please try again.');
+      const errorMessage = err.message || 'Failed to search for locations. Please try again.';
+      setError(errorMessage);
+      Analytics.logSearchFailure({ query, errorMessage });
     } finally {
       setIsLoading(false);
     }

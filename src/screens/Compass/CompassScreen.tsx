@@ -19,10 +19,11 @@ import { ScreenProps } from '../../navigation/types';
 import { colors, spacing, borderRadius } from '../../constants/theme';
 import { Loading } from '../../components/common/Loading';
 import { ErrorMessage } from '../../components/common/ErrorMessage';
-import { Compass } from '../../components/compass';
+import { Compass, CalibrationGuide } from '../../components/compass';
 import { useCompass } from '../../hooks';
 import { storageService } from '../../services/storage';
 import { CalculationService } from '../../services/calculations/CalculationService';
+import { Analytics, ScreenNames } from '../../utils';
 
 type Props = ScreenProps<'Compass'>;
 
@@ -32,8 +33,14 @@ export const CompassScreen: React.FC<Props> = ({ route, navigation }) => {
   // Favorite state
   const [isFavorite, setIsFavorite] = useState(false);
 
+  // Calibration guide state
+  const [showCalibrationGuide, setShowCalibrationGuide] = useState(false);
+
   // Pulse animation for aligned state
   const pulseScale = useSharedValue(1);
+
+  // Track if we've already logged alignment success (to avoid duplicate logs)
+  const hasLoggedAlignment = React.useRef(false);
 
   // Use the compass hook
   const {
@@ -57,6 +64,15 @@ export const CompassScreen: React.FC<Props> = ({ route, navigation }) => {
           -1,
           false,
         );
+        // Log alignment success (only once per session)
+        if (!hasLoggedAlignment.current) {
+          hasLoggedAlignment.current = true;
+          Analytics.logAlignmentSuccess({
+            locationName: location.name,
+            bearing,
+            distance,
+          });
+        }
       } else {
         // Stop pulse animation
         pulseScale.value = withTiming(1, { duration: 200 });
@@ -68,6 +84,16 @@ export const CompassScreen: React.FC<Props> = ({ route, navigation }) => {
   const pulseAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: pulseScale.value }],
   }));
+
+  // Track screen view and compass view
+  useEffect(() => {
+    Analytics.logScreenView(ScreenNames.COMPASS);
+    Analytics.logCompassView({
+      locationName: location.name,
+      bearing,
+      distance,
+    });
+  }, []);
 
   // Check if location is favorited
   useEffect(() => {
@@ -95,10 +121,18 @@ export const CompassScreen: React.FC<Props> = ({ route, navigation }) => {
         if (favorite) {
           await storageService.deleteFavorite(favorite.id);
           setIsFavorite(false);
+          Analytics.logFavoriteRemoved({
+            locationName: location.name,
+            locationId: favorite.id,
+          });
         }
       } else {
         await storageService.addFavorite(location);
         setIsFavorite(true);
+        Analytics.logFavoriteAdded({
+          locationName: location.name,
+          locationId: location.id,
+        });
       }
     } catch (error) {
       console.error('[CompassScreen] Failed to toggle favorite:', error);
@@ -249,10 +283,24 @@ export const CompassScreen: React.FC<Props> = ({ route, navigation }) => {
 
         {/* Calibration Warning */}
         {needsCalibration && (
-          <View style={styles.calibrationBanner}>
-            <Text style={styles.calibrationText}>Move device in figure-8 to calibrate</Text>
-          </View>
+          <TouchableOpacity
+            onPress={() => setShowCalibrationGuide(true)}
+            style={styles.calibrationBanner}
+            activeOpacity={0.8}
+            accessibilityLabel="Compass needs calibration. Tap for instructions."
+            accessibilityRole="button"
+          >
+            <Text style={styles.calibrationText}>⚠️ Tap for calibration guide</Text>
+          </TouchableOpacity>
         )}
+
+        {/* Calibration Guide BottomSheet */}
+        <CalibrationGuide
+          visible={showCalibrationGuide}
+          onDismiss={() => setShowCalibrationGuide(false)}
+          autoHide={true}
+          isCalibrated={!needsCalibration}
+        />
 
         {/* Simulator Mode */}
         {isSimulatorMode && (

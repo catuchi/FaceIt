@@ -36,6 +36,10 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-firebase/analytics": "^23.8.3",
+    "@react-native-firebase/app": "^23.8.3",
+    "@react-native-firebase/crashlytics": "^23.8.3",
+    "@react-native-firebase/remote-config": "^23.8.3",
     "@react-native-masked-view/masked-view": "^0.3.2",
     "@react-native/new-app-screen": "0.83.1",
     "@react-navigation/native": "^7.1.28",

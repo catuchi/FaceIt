@@ -117,3 +117,7 @@ dependencies {
         implementation jscFlavor
     }
 }
+
+// Firebase
+apply plugin: "com.google.gms.google-services"
+apply plugin: "com.google.firebase.crashlytics"

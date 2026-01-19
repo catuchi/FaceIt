@@ -13,6 +13,7 @@ import { colors, spacing, borderRadius } from '../../constants/theme';
 import { BottomSheet } from '../../components/ui/BottomSheet';
 import { storageService } from '../../services/storage';
 import { UserPreferences } from '../../types/storage';
+import { Analytics, ScreenNames } from '../../utils';
 
 type Props = ScreenProps<'Settings'>;
 
@@ -100,6 +101,7 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
   const [showDistanceUnitPicker, setShowDistanceUnitPicker] = useState(false);
 
   useEffect(() => {
+    Analytics.logScreenView(ScreenNames.SETTINGS);
     loadPreferences();
   }, []);
 
@@ -114,9 +116,15 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleDistanceUnitChange = async (unit: 'km' | 'mi') => {
     try {
+      const oldValue = preferences.distanceUnit;
       await storageService.setPreference('distanceUnit', unit);
       setPreferences(prev => ({ ...prev, distanceUnit: unit }));
       setShowDistanceUnitPicker(false);
+      Analytics.logSettingChanged({
+        settingName: 'distanceUnit',
+        oldValue,
+        newValue: unit,
+      });
     } catch (error) {
       console.error('[SettingsScreen] Failed to update distance unit:', error);
     }
@@ -124,8 +132,14 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleHapticFeedbackChange = async (enabled: boolean) => {
     try {
+      const oldValue = preferences.hapticFeedbackEnabled;
       await storageService.setPreference('hapticFeedbackEnabled', enabled);
       setPreferences(prev => ({ ...prev, hapticFeedbackEnabled: enabled }));
+      Analytics.logSettingChanged({
+        settingName: 'hapticFeedbackEnabled',
+        oldValue: String(oldValue),
+        newValue: String(enabled),
+      });
     } catch (error) {
       console.error('[SettingsScreen] Failed to update haptic feedback:', error);
     }
@@ -146,6 +160,7 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
           onPress: async () => {
             try {
               await storageService.clearHistory();
+              Analytics.logHistoryCleared();
               Alert.alert('Success', 'Search history has been cleared.');
             } catch (error) {
               console.error('[SettingsScreen] Failed to clear history:', error);

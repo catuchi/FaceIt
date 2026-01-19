@@ -21,6 +21,7 @@ import { ScreenProps } from '../../navigation/types';
 import { colors, spacing, typography, borderRadius } from '../../constants/theme';
 import { storageService } from '../../services/storage';
 import { Location } from '../../types/storage';
+import { Analytics, ScreenNames } from '../../utils';
 
 // Hardcoded popular locations
 const POPULAR_LOCATIONS = [
@@ -85,10 +86,11 @@ export const LandingScreen: React.FC<Props> = ({ navigation }) => {
     loadRecentHistory();
   }, []);
 
-  // Reload history when screen comes into focus
+  // Reload history and track screen view when screen comes into focus
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       loadRecentHistory();
+      Analytics.logScreenView(ScreenNames.LANDING);
     });
     return unsubscribe;
   }, [navigation]);
@@ -108,6 +110,7 @@ export const LandingScreen: React.FC<Props> = ({ navigation }) => {
   const handleSearch = useCallback(() => {
     if (searchQuery.trim().length === 0) return;
     Keyboard.dismiss();
+    Analytics.logSearch({ query: searchQuery.trim() });
     navigation.navigate('SearchResults', { query: searchQuery.trim() });
   }, [searchQuery, navigation]);
 

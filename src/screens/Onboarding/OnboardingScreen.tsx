@@ -19,6 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
 import { ScreenProps } from '../../navigation/types';
 import { colors, spacing, borderRadius } from '../../constants/theme';
+import { Analytics, ScreenNames } from '../../utils';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const ONBOARDING_COMPLETE_KEY = '@faceit:onboarding_complete';
@@ -62,6 +63,11 @@ type Props = ScreenProps<'Onboarding'>;
 export const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
+
+  // Track screen view on mount
+  React.useEffect(() => {
+    Analytics.logScreenView(ScreenNames.ONBOARDING);
+  }, []);
 
   const handleViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
