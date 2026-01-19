@@ -20,6 +20,7 @@ const GOOGLE_AUTOCOMPLETE_API = 'https://maps.googleapis.com/maps/api/place/auto
 const DEFAULT_DEBOUNCE_MS = 300;
 const DEFAULT_TIMEOUT_MS = 5000;
 const DEFAULT_MAX_RESULTS = 5;
+const MAX_QUERY_LENGTH = 256; // Security: limit query length to prevent abuse
 
 export class GeocodingService {
   private apiKey: string;
@@ -50,6 +51,14 @@ export class GeocodingService {
   async searchByText(query: string): Promise<GeocodingResult[]> {
     if (!query || query.trim().length === 0) {
       throw new GeocodingError('Query cannot be empty', GeocodingErrorType.INVALID_REQUEST);
+    }
+
+    // Security: limit query length to prevent abuse
+    if (query.length > MAX_QUERY_LENGTH) {
+      throw new GeocodingError(
+        `Query too long (max ${MAX_QUERY_LENGTH} characters)`,
+        GeocodingErrorType.INVALID_REQUEST,
+      );
     }
 
     // Check cache first
@@ -152,6 +161,11 @@ export class GeocodingService {
    */
   async getAutocompleteSuggestions(input: string): Promise<Suggestion[]> {
     if (!input || input.trim().length === 0) {
+      return [];
+    }
+
+    // Security: limit input length to prevent abuse
+    if (input.length > MAX_QUERY_LENGTH) {
       return [];
     }
 
