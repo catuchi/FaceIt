@@ -4,7 +4,7 @@
  * Design: Flighty-inspired dark UI with teal-cyan gradient accents
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, memo } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Animated, {
@@ -18,6 +18,9 @@ import { colors, borderRadius } from '@constants/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const DEFAULT_COMPASS_SIZE = Math.min(SCREEN_WIDTH * 0.75, 280);
+
+// Static tick positions - defined outside component to avoid recreation
+const TICK_DEGREES = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330] as const;
 
 export interface CompassProps {
   /** Target bearing in degrees (0-360) */
@@ -71,7 +74,7 @@ const normalizeAngle = (angle: number): number => {
   return angle;
 };
 
-export const Compass: React.FC<CompassProps> = ({
+const CompassComponent: React.FC<CompassProps> = ({
   bearing,
   deviceHeading,
   isAligned,
@@ -103,16 +106,21 @@ export const Compass: React.FC<CompassProps> = ({
     };
   });
 
-  // Calculate sizes based on compass size
-  const compassSize = size;
-  const borderWidth = 4;
-  const outerSize = compassSize + borderWidth * 2;
-  const needleLength = compassSize * 0.35;
-  const needleWidth = 6;
-  const tickOffset = compassSize / 2 - 20;
+  // Memoize calculated sizes to avoid recalculation on every render
+  const sizes = useMemo(
+    () => ({
+      compassSize: size,
+      borderWidth: 4,
+      outerSize: size + 4 * 2,
+      needleLength: size * 0.35,
+      needleWidth: 6,
+      tickOffset: size / 2 - 20,
+    }),
+    [size],
+  );
 
-  // Degree ticks positions
-  const tickDegrees = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
+  // Destructure memoized sizes
+  const { compassSize, borderWidth, outerSize, needleLength, needleWidth, tickOffset } = sizes;
 
   const renderCompassFace = () => (
     <View
@@ -128,7 +136,7 @@ export const Compass: React.FC<CompassProps> = ({
       <Text style={[styles.cardinal, styles.cardinalW, { left: 24 }]}>W</Text>
 
       {/* Degree Ticks */}
-      {tickDegrees.map(deg => (
+      {TICK_DEGREES.map(deg => (
         <View
           key={deg}
           style={[
@@ -301,5 +309,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 });
+
+// Memoize component to prevent unnecessary re-renders
+export const Compass = memo(CompassComponent);
 
 export default Compass;

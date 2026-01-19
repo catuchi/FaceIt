@@ -4,7 +4,7 @@
  * Handles location, bearing calculation, sensor tracking, and alignment detection
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { LocationService } from '../services/location/LocationService';
 import { SensorService } from '../services/sensors/SensorService';
 import { MockSensorService } from '../services/sensors/MockSensorService';
@@ -159,7 +159,7 @@ export function useCompass({
     };
   }, [currentLocation, startSensorTracking]);
 
-  // Update calculations when heading or location changes
+  // Calculate bearing and distance only when location changes (not on every heading update)
   useEffect(() => {
     if (!currentLocation) return;
 
@@ -177,9 +177,14 @@ export function useCompass({
     // Get cardinal direction
     const cardinal = CalculationService.getCardinalDirection(calculatedBearing);
     setCardinalDirection(cardinal);
+  }, [currentLocation, targetLocation]);
 
-    // Check alignment
-    const bearingDiff = Math.abs(calculatedBearing - deviceHeading);
+  // Check alignment separately - this runs on every heading change but is lightweight
+  useEffect(() => {
+    if (!currentLocation) return;
+
+    // Check alignment (lightweight calculation)
+    const bearingDiff = Math.abs(bearing - deviceHeading);
     const normalizedDiff = Math.min(bearingDiff, 360 - bearingDiff);
     const aligned = normalizedDiff <= alignmentThreshold;
     setIsAligned(aligned);
@@ -189,7 +194,7 @@ export function useCompass({
       prevIsAlignedRef.current = aligned;
       onAlignmentChange?.(aligned);
     }
-  }, [currentLocation, targetLocation, deviceHeading, alignmentThreshold, onAlignmentChange]);
+  }, [bearing, deviceHeading, alignmentThreshold, onAlignmentChange, currentLocation]);
 
   // Retry location function
   const retryLocation = useCallback(() => {
