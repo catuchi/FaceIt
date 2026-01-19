@@ -5,178 +5,74 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 import { ScreenProps } from '../../navigation/types';
-import { colors, spacing, typography, borderRadius } from '../../constants/theme';
+import { colors, spacing, borderRadius } from '../../constants/theme';
 import { Loading } from '../../components/common/Loading';
 import { ErrorMessage } from '../../components/common/ErrorMessage';
-import { LocationService } from '../../services/location/LocationService';
-import { SensorService } from '../../services/sensors/SensorService';
-import { MockSensorService } from '../../services/sensors/MockSensorService';
-import { CalculationService } from '../../services/calculations/CalculationService';
+import { Compass } from '../../components/compass';
+import { useCompass } from '../../hooks';
 import { storageService } from '../../services/storage';
-import { Coordinates } from '../../types/location';
-import { SensorAccuracy } from '../../types/sensors';
-
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const COMPASS_SIZE = Math.min(SCREEN_WIDTH * 0.75, 300);
-const ALIGNMENT_THRESHOLD = 5; // degrees
+import { CalculationService } from '../../services/calculations/CalculationService';
 
 type Props = ScreenProps<'Compass'>;
 
 export const CompassScreen: React.FC<Props> = ({ route, navigation }) => {
   const { location } = route.params;
 
-  // Location state
-  const [currentLocation, setCurrentLocation] = useState<Coordinates | null>(null);
-  const [isLoadingLocation, setIsLoadingLocation] = useState(true);
-  const [locationError, setLocationError] = useState<string | null>(null);
-
-  // Sensor state
-  const [deviceHeading, setDeviceHeading] = useState(0);
-  const [sensorAccuracy, setSensorAccuracy] = useState<SensorAccuracy>(SensorAccuracy.MEDIUM);
-  const [needsCalibration, setNeedsCalibration] = useState(false);
-
-  // Compass calculations
-  const [bearing, setBearing] = useState(0);
-  const [distance, setDistance] = useState(0);
-  const [isAligned, setIsAligned] = useState(false);
-
   // Favorite state
   const [isFavorite, setIsFavorite] = useState(false);
 
-  // Sensor state
-  const [usingMockSensors, setUsingMockSensors] = useState(false);
+  // Pulse animation for aligned state
+  const pulseScale = useSharedValue(1);
 
-  // Animated values
-  const [needleRotation] = useState(new Animated.Value(0));
-  const [pulseAnim] = useState(new Animated.Value(1));
+  // Use the compass hook
+  const {
+    bearing,
+    deviceHeading,
+    isAligned,
+    needsCalibration,
+    distance,
+    currentLocation,
+    isLoadingLocation,
+    locationError,
+    isSimulatorMode,
+    retryLocation,
+  } = useCompass({
+    targetLocation: location.coordinates,
+    onAlignmentChange: aligned => {
+      if (aligned) {
+        // Start pulse animation when aligned
+        pulseScale.value = withRepeat(
+          withSequence(withTiming(1.05, { duration: 1000 }), withTiming(1, { duration: 1000 })),
+          -1,
+          false,
+        );
+      } else {
+        // Stop pulse animation
+        pulseScale.value = withTiming(1, { duration: 200 });
+      }
+    },
+  });
 
-  const locationService = new LocationService();
-  const sensorService = new SensorService();
-  const mockSensorService = new MockSensorService();
-
-  // Load current location on mount
-  useEffect(() => {
-    loadCurrentLocation();
-    return () => {
-      // Cleanup location service if needed
-    };
-  }, []);
-
-  // Start sensor tracking when location is available
-  useEffect(() => {
-    if (currentLocation) {
-      startSensorTracking();
-    }
-    return () => {
-      sensorService.stopHeadingTracking();
-      mockSensorService.stopHeadingTracking();
-    };
-  }, [currentLocation]);
+  // Animated style for pulse effect
+  const pulseAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulseScale.value }],
+  }));
 
   // Check if location is favorited
   useEffect(() => {
     checkFavoriteStatus();
   }, [location]);
-
-  // Update calculations when heading or location changes
-  useEffect(() => {
-    if (currentLocation) {
-      updateCalculations();
-    }
-  }, [currentLocation, deviceHeading, location]);
-
-  // Pulse animation when aligned
-  useEffect(() => {
-    if (isAligned) {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulseAnim, {
-            toValue: 1.05,
-            duration: 1000,
-            useNativeDriver: true,
-          }),
-          Animated.timing(pulseAnim, {
-            toValue: 1,
-            duration: 1000,
-            useNativeDriver: true,
-          }),
-        ]),
-      ).start();
-    } else {
-      pulseAnim.setValue(1);
-    }
-  }, [isAligned]);
-
-  const loadCurrentLocation = async () => {
-    try {
-      setIsLoadingLocation(true);
-      setLocationError(null);
-
-      const coords = await locationService.getCurrentLocation();
-      setCurrentLocation(coords);
-    } catch (error: any) {
-      console.error('[CompassScreen] Failed to get location:', error);
-      setLocationError(error.message || 'Failed to get your location');
-    } finally {
-      setIsLoadingLocation(false);
-    }
-  };
-
-  const startSensorTracking = () => {
-    try {
-      sensorService.startHeadingTracking(
-        data => {
-          setDeviceHeading(data.heading);
-          setSensorAccuracy(data.accuracy);
-          setNeedsCalibration(data.needsCalibration);
-        },
-        error => {
-          console.warn('[CompassScreen] Real sensors not available, using mock sensors:', error);
-          setUsingMockSensors(true);
-          mockSensorService.startHeadingTracking(data => {
-            setDeviceHeading(data.heading);
-            setSensorAccuracy(data.accuracy);
-            setNeedsCalibration(data.needsCalibration);
-          });
-        },
-      );
-    } catch (error) {
-      console.error('[CompassScreen] Failed to start sensor tracking:', error);
-    }
-  };
-
-  const updateCalculations = () => {
-    if (!currentLocation) return;
-
-    const calculatedBearing = CalculationService.calculateBearing(
-      currentLocation,
-      location.coordinates,
-    );
-    setBearing(calculatedBearing);
-
-    const calculatedDistance = CalculationService.calculateDistance(
-      currentLocation,
-      location.coordinates,
-    );
-    setDistance(calculatedDistance);
-
-    const bearingDiff = Math.abs(calculatedBearing - deviceHeading);
-    const normalizedDiff = Math.min(bearingDiff, 360 - bearingDiff);
-    const aligned = normalizedDiff <= ALIGNMENT_THRESHOLD;
-    setIsAligned(aligned);
-
-    const targetRotation = calculatedBearing - deviceHeading;
-    Animated.spring(needleRotation, {
-      toValue: targetRotation,
-      damping: 15,
-      stiffness: 100,
-      useNativeDriver: true,
-    }).start();
-  };
 
   const checkFavoriteStatus = async () => {
     try {
@@ -210,8 +106,8 @@ export const CompassScreen: React.FC<Props> = ({ route, navigation }) => {
   };
 
   const handleRetry = useCallback(() => {
-    loadCurrentLocation();
-  }, []);
+    retryLocation();
+  }, [retryLocation]);
 
   const formatDistance = (meters: number): string => {
     return CalculationService.formatDistance(meters);
@@ -277,27 +173,15 @@ export const CompassScreen: React.FC<Props> = ({ route, navigation }) => {
 
         {/* Main Content */}
         <View style={styles.content}>
-          {/* Compass */}
-          <Animated.View
-            style={[styles.compassContainer, { transform: [{ scale: isAligned ? pulseAnim : 1 }] }]}
-          >
-            {/* Compass Ring */}
-            <View style={[styles.compassRing, isAligned && styles.compassRingAligned]}>
-              {isAligned ? (
-                <LinearGradient
-                  colors={[colors.gradient.start, colors.gradient.end]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.compassGradientBorder}
-                >
-                  <View style={styles.compassInner}>{renderCompassContent()}</View>
-                </LinearGradient>
-              ) : (
-                <View style={styles.compassBorder}>
-                  <View style={styles.compassInner}>{renderCompassContent()}</View>
-                </View>
-              )}
-            </View>
+          {/* Compass with pulse animation */}
+          <Animated.View style={[styles.compassContainer, pulseAnimatedStyle]}>
+            <Compass
+              bearing={bearing}
+              deviceHeading={deviceHeading}
+              isAligned={isAligned}
+              showBearing={true}
+              showCardinal={false}
+            />
           </Animated.View>
 
           {/* Instruction */}
@@ -371,7 +255,7 @@ export const CompassScreen: React.FC<Props> = ({ route, navigation }) => {
         )}
 
         {/* Simulator Mode */}
-        {usingMockSensors && (
+        {isSimulatorMode && (
           <View style={styles.simulatorBanner}>
             <Text style={styles.simulatorText}>Simulator Mode</Text>
           </View>
@@ -379,62 +263,6 @@ export const CompassScreen: React.FC<Props> = ({ route, navigation }) => {
       </SafeAreaView>
     </View>
   );
-
-  function renderCompassContent() {
-    return (
-      <>
-        {/* Cardinal Markers */}
-        <Text style={[styles.cardinal, styles.cardinalN]}>N</Text>
-        <Text style={[styles.cardinal, styles.cardinalE]}>E</Text>
-        <Text style={[styles.cardinal, styles.cardinalS]}>S</Text>
-        <Text style={[styles.cardinal, styles.cardinalW]}>W</Text>
-
-        {/* Degree Ticks */}
-        {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map(deg => (
-          <View
-            key={deg}
-            style={[
-              styles.tick,
-              {
-                transform: [{ rotate: `${deg}deg` }, { translateY: -COMPASS_SIZE / 2 + 20 }],
-              },
-              deg % 90 === 0 ? styles.tickMajor : styles.tickMinor,
-            ]}
-          />
-        ))}
-
-        {/* Animated Needle */}
-        <Animated.View
-          style={[
-            styles.needle,
-            {
-              transform: [
-                {
-                  rotate: needleRotation.interpolate({
-                    inputRange: [-360, 360],
-                    outputRange: ['-360deg', '360deg'],
-                  }),
-                },
-              ],
-            },
-          ]}
-        >
-          <LinearGradient
-            colors={[colors.gradient.start, colors.gradient.end]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-            style={styles.needleGradient}
-          />
-          <View style={styles.needleTip} />
-        </Animated.View>
-
-        {/* Center Display */}
-        <View style={styles.centerDisplay}>
-          <Text style={styles.bearingLarge}>{Math.round(bearing)}°</Text>
-        </View>
-      </>
-    );
-  }
 };
 
 const styles = StyleSheet.create({
@@ -480,102 +308,6 @@ const styles = StyleSheet.create({
   },
   compassContainer: {
     marginBottom: spacing['2xl'],
-  },
-  compassRing: {
-    width: COMPASS_SIZE + 8,
-    height: COMPASS_SIZE + 8,
-    borderRadius: (COMPASS_SIZE + 8) / 2,
-  },
-  compassRingAligned: {
-    // Handled by gradient
-  },
-  compassGradientBorder: {
-    width: COMPASS_SIZE + 8,
-    height: COMPASS_SIZE + 8,
-    borderRadius: (COMPASS_SIZE + 8) / 2,
-    padding: 4,
-  },
-  compassBorder: {
-    width: COMPASS_SIZE + 8,
-    height: COMPASS_SIZE + 8,
-    borderRadius: (COMPASS_SIZE + 8) / 2,
-    padding: 4,
-    backgroundColor: colors.background.tertiary,
-  },
-  compassInner: {
-    width: COMPASS_SIZE,
-    height: COMPASS_SIZE,
-    borderRadius: COMPASS_SIZE / 2,
-    backgroundColor: colors.background.secondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cardinal: {
-    position: 'absolute',
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text.tertiary,
-  },
-  cardinalN: {
-    top: 24,
-    color: colors.accent.primary,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  cardinalE: {
-    right: 24,
-  },
-  cardinalS: {
-    bottom: 24,
-  },
-  cardinalW: {
-    left: 24,
-  },
-  tick: {
-    position: 'absolute',
-    width: 2,
-    backgroundColor: colors.border.medium,
-  },
-  tickMajor: {
-    height: 12,
-    backgroundColor: colors.text.tertiary,
-  },
-  tickMinor: {
-    height: 6,
-  },
-  needle: {
-    position: 'absolute',
-    width: 6,
-    height: COMPASS_SIZE * 0.35,
-    alignItems: 'center',
-    top: COMPASS_SIZE * 0.15,
-  },
-  needleGradient: {
-    width: 6,
-    height: '85%',
-    borderRadius: 3,
-  },
-  needleTip: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: 6,
-    borderRightWidth: 6,
-    borderBottomWidth: 10,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor: colors.gradient.end,
-    marginTop: -2,
-  },
-  centerDisplay: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bearingLarge: {
-    fontSize: 56,
-    fontWeight: '200',
-    color: colors.text.primary,
-    letterSpacing: -2,
   },
   instructionContainer: {
     marginTop: spacing.lg,
@@ -680,7 +412,7 @@ const styles = StyleSheet.create({
     top: 100,
     left: spacing.lg,
     right: spacing.lg,
-    backgroundColor: colors.warning.dark,
+    backgroundColor: colors.warning?.dark || colors.background.tertiary,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.md,
