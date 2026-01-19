@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import { LocationService } from '../services/location/LocationService';
 import { SensorService } from '../services/sensors/SensorService';
 import { MockSensorService } from '../services/sensors/MockSensorService';
@@ -156,6 +157,26 @@ export function useCompass({
     return () => {
       sensorServiceRef.current?.stopHeadingTracking();
       mockSensorServiceRef.current?.stopHeadingTracking();
+    };
+  }, [currentLocation, startSensorTracking]);
+
+  // Stop sensors when app goes to background (battery optimization)
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'background' || nextAppState === 'inactive') {
+        // Stop sensors when app is backgrounded
+        sensorServiceRef.current?.stopHeadingTracking();
+        mockSensorServiceRef.current?.stopHeadingTracking();
+      } else if (nextAppState === 'active' && currentLocation) {
+        // Restart sensors when app comes to foreground
+        startSensorTracking();
+      }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+    return () => {
+      subscription.remove();
     };
   }, [currentLocation, startSensorTracking]);
 
