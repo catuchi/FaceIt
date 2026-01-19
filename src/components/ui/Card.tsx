@@ -1,17 +1,16 @@
 /**
  * Card Component
- * Container component with variants, padding options, and gradient border support
+ * Flighty-inspired container with variants, padding options, and gradient border support
  */
 
 import React from 'react';
 import { TouchableOpacity, View, StyleSheet, ViewStyle } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { theme } from '@constants/theme';
-import { primaryGradient } from '@utils/gradients';
 import type { PressableComponentProps, ChildrenProps } from '@shared/types';
 
-export type CardVariant = 'default' | 'elevated' | 'active';
-export type CardPadding = 'sm' | 'md' | 'lg';
+export type CardVariant = 'default' | 'elevated' | 'active' | 'subtle';
+export type CardPadding = 'none' | 'sm' | 'md' | 'lg';
 
 export interface CardProps extends PressableComponentProps, ChildrenProps {
   variant?: CardVariant;
@@ -33,6 +32,7 @@ export const Card: React.FC<CardProps> = ({
 }) => {
   const getPadding = (): number => {
     const paddingMap: Record<CardPadding, number> = {
+      none: 0,
       sm: theme.spacing.md,
       md: theme.spacing.lg,
       lg: theme.spacing.xl,
@@ -43,6 +43,7 @@ export const Card: React.FC<CardProps> = ({
   const getBackgroundColor = (): string => {
     if (variant === 'elevated') return theme.colors.background.secondary;
     if (variant === 'active') return theme.colors.background.tertiary;
+    if (variant === 'subtle') return theme.colors.background.secondary + '80';
     return theme.colors.background.secondary;
   };
 
@@ -60,27 +61,24 @@ export const Card: React.FC<CardProps> = ({
 
   // If the card is pressable, wrap in TouchableOpacity
   if (onPress || onLongPress) {
-    const content = <View style={[cardStyle, style]}>{children}</View>;
-
     if (gradientBorder && variant === 'active') {
       return (
         <TouchableOpacity
           onPress={onPress}
           onLongPress={onLongPress}
           disabled={disabled}
-          activeOpacity={0.8}
+          activeOpacity={0.7}
           testID={testID}
           accessibilityLabel={accessibilityLabel}
           accessibilityRole="button"
         >
           <LinearGradient
-            colors={primaryGradient.colors}
-            start={primaryGradient.start}
-            end={primaryGradient.end}
-            locations={primaryGradient.locations}
+            colors={[theme.colors.gradient.start, theme.colors.gradient.end]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
             style={styles.gradientBorder}
           >
-            {content}
+            <View style={[cardStyle, styles.gradientInner, style]}>{children}</View>
           </LinearGradient>
         </TouchableOpacity>
       );
@@ -91,7 +89,7 @@ export const Card: React.FC<CardProps> = ({
         onPress={onPress}
         onLongPress={onLongPress}
         disabled={disabled}
-        activeOpacity={0.8}
+        activeOpacity={0.7}
         style={[cardStyle, style]}
         testID={testID}
         accessibilityLabel={accessibilityLabel}
@@ -106,13 +104,16 @@ export const Card: React.FC<CardProps> = ({
   if (gradientBorder && variant === 'active') {
     return (
       <LinearGradient
-        colors={primaryGradient.colors}
-        start={primaryGradient.start}
-        end={primaryGradient.end}
-        locations={primaryGradient.locations}
+        colors={[theme.colors.gradient.start, theme.colors.gradient.end]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
         style={styles.gradientBorder}
       >
-        <View style={[cardStyle, style]} testID={testID} accessibilityLabel={accessibilityLabel}>
+        <View
+          style={[cardStyle, styles.gradientInner, style]}
+          testID={testID}
+          accessibilityLabel={accessibilityLabel}
+        >
           {children}
         </View>
       </LinearGradient>
@@ -128,7 +129,10 @@ export const Card: React.FC<CardProps> = ({
 
 const styles = StyleSheet.create({
   gradientBorder: {
+    borderRadius: theme.borderRadius.lg + 2,
+    padding: 2,
+  },
+  gradientInner: {
     borderRadius: theme.borderRadius.lg,
-    padding: 2, // Border width
   },
 });

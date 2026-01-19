@@ -58,7 +58,10 @@ export class SensorService {
   /**
    * Start heading tracking with sensor fusion
    */
-  startHeadingTracking(callback: (data: SensorFusionData) => void): SensorSubscription {
+  startHeadingTracking(
+    callback: (data: SensorFusionData) => void,
+    errorCallback?: (error: SensorError) => void,
+  ): SensorSubscription {
     // Subscribe to magnetometer
     this.magnetometerSubscription = magnetometer.subscribe(
       ({ x, y, z, timestamp }) => {
@@ -68,11 +71,14 @@ export class SensorService {
       },
       error => {
         console.error('[SensorService] Magnetometer error:', error);
-        throw new SensorError(
-          'Magnetometer not available',
+        const sensorError = new SensorError(
+          'Magnetometer not available. This app requires a physical device with sensors.',
           SensorErrorType.SENSOR_NOT_AVAILABLE,
           error,
         );
+        if (errorCallback) {
+          errorCallback(sensorError);
+        }
       },
     );
 
@@ -85,11 +91,14 @@ export class SensorService {
       },
       error => {
         console.error('[SensorService] Accelerometer error:', error);
-        throw new SensorError(
-          'Accelerometer not available',
+        const sensorError = new SensorError(
+          'Accelerometer not available. This app requires a physical device with sensors.',
           SensorErrorType.SENSOR_NOT_AVAILABLE,
           error,
         );
+        if (errorCallback) {
+          errorCallback(sensorError);
+        }
       },
     );
 
@@ -262,7 +271,10 @@ export class SensorService {
   /**
    * Get simple compass heading (without full sensor fusion)
    */
-  getCompassHeading(callback: (data: CompassData) => void): SensorSubscription {
+  getCompassHeading(
+    callback: (data: CompassData) => void,
+    errorCallback?: (error: SensorError) => void,
+  ): SensorSubscription {
     const subscription = magnetometer.subscribe(
       ({ x, y, z, timestamp }) => {
         // Simple heading calculation (assumes device is flat)
@@ -286,7 +298,14 @@ export class SensorService {
       },
       error => {
         console.error('[SensorService] Compass error:', error);
-        throw new SensorError('Compass not available', SensorErrorType.SENSOR_NOT_AVAILABLE, error);
+        const sensorError = new SensorError(
+          'Compass not available. This app requires a physical device with sensors.',
+          SensorErrorType.SENSOR_NOT_AVAILABLE,
+          error,
+        );
+        if (errorCallback) {
+          errorCallback(sensorError);
+        }
       },
     );
 

@@ -4,39 +4,40 @@
  */
 
 export const colors = {
-  // Background colors
+  // Background colors (Flighty-inspired dark theme)
   background: {
-    primary: '#0F0F0F',
-    secondary: '#1A1A1A',
-    tertiary: '#242424',
+    primary: '#101010', // Near black
+    secondary: '#2c2c2c', // Dark gray (cards)
+    tertiary: '#3a3a3a', // Medium gray (elevated)
   },
 
-  // Gradient colors
+  // Gradient colors (Teal to Cyan)
   gradient: {
-    start: '#00D9B8',
-    middle: '#00E8C3',
-    end: '#00FFD1',
+    start: '#57ecb2', // Teal
+    middle: '#54d9b9', // Mid teal-cyan
+    end: '#50b6ff', // Cyan/Blue
   },
 
   // Accent colors
   accent: {
-    primary: '#00E8C3',
+    primary: '#57ecb2', // Teal
+    secondary: '#50b6ff', // Cyan
     gold: '#FFD700',
   },
 
   // Text colors
   text: {
-    primary: '#FFFFFF',
-    secondary: '#E0E0E0',
-    tertiary: '#A8A8A8',
-    disabled: '#666666',
+    primary: '#ffffff', // White
+    secondary: '#a0a0a0', // Muted gray
+    tertiary: '#6a6a6a', // Subtle gray
+    disabled: '#4a4a4a',
   },
 
   // Border colors
   border: {
-    subtle: '#2A2A2A',
-    medium: '#3A3A3A',
-    accent: '#00E8C3',
+    subtle: '#2c2c2c',
+    medium: '#3a3a3a',
+    accent: '#57ecb2',
   },
 
   // Semantic colors
@@ -46,9 +47,9 @@ export const colors = {
     dark: '#DC2626',
   },
   success: {
-    main: '#10B981',
-    light: '#6EE7B7',
-    dark: '#059669',
+    main: '#57ecb2', // Teal (matches accent)
+    light: '#7af0c4',
+    dark: '#3dd9a0',
   },
   warning: {
     main: '#F59E0B',
@@ -56,9 +57,9 @@ export const colors = {
     dark: '#D97706',
   },
   info: {
-    main: '#3B82F6',
-    light: '#93C5FD',
-    dark: '#2563EB',
+    main: '#50b6ff', // Cyan (matches gradient end)
+    light: '#7ec8ff',
+    dark: '#3aa3f0',
   },
 
   // Overlay colors

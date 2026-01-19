@@ -1,6 +1,6 @@
 /**
  * TextInput Component
- * Customizable text input with dark theme styling, focus states, and error handling
+ * Flighty-inspired text input with dark theme styling, focus states, and error handling
  */
 
 import React, { useState } from 'react';
@@ -24,6 +24,7 @@ export interface TextInputProps extends Omit<RNTextInputProps, 'style'>, BaseCom
   rightIcon?: React.ReactNode;
   size?: Size;
   containerStyle?: ViewStyle;
+  pill?: boolean;
 }
 
 export const TextInput: React.FC<TextInputProps> = ({
@@ -35,6 +36,7 @@ export const TextInput: React.FC<TextInputProps> = ({
   size = 'md',
   containerStyle,
   style,
+  pill = false,
   onFocus,
   onBlur,
   testID,
@@ -44,13 +46,18 @@ export const TextInput: React.FC<TextInputProps> = ({
   const [isFocused, setIsFocused] = useState(false);
 
   const getInputHeight = (): number => {
-    return theme.layout.inputHeight[size];
+    const heightMap: Record<Size, number> = {
+      sm: 40,
+      md: 52,
+      lg: 56,
+    };
+    return heightMap[size];
   };
 
   const getPadding = (): number => {
     const paddingMap: Record<Size, number> = {
-      sm: theme.spacing.sm,
-      md: theme.spacing.md,
+      sm: theme.spacing.md,
+      md: theme.spacing.lg,
       lg: theme.spacing.lg,
     };
     return paddingMap[size];
@@ -65,10 +72,15 @@ export const TextInput: React.FC<TextInputProps> = ({
     return sizeMap[size];
   };
 
+  const getBorderRadius = (): number => {
+    if (pill) return theme.borderRadius.pill;
+    return theme.borderRadius.lg;
+  };
+
   const getBorderColor = (): string => {
     if (error) return theme.colors.error.main;
-    if (isFocused) return theme.colors.border.accent;
-    return theme.colors.border.subtle;
+    if (isFocused) return theme.colors.accent.primary;
+    return 'transparent';
   };
 
   const inputContainerStyle: ViewStyle = {
@@ -76,11 +88,10 @@ export const TextInput: React.FC<TextInputProps> = ({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: theme.colors.background.secondary,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
+    borderRadius: getBorderRadius(),
+    borderWidth: isFocused || error ? 2 : 0,
     borderColor: getBorderColor(),
     paddingHorizontal: getPadding(),
-    ...(isFocused && !error && theme.shadows.glow),
   };
 
   const inputStyle: TextStyle = {
@@ -89,19 +100,22 @@ export const TextInput: React.FC<TextInputProps> = ({
     color: theme.colors.text.primary,
     paddingLeft: leftIcon ? theme.spacing.sm : 0,
     paddingRight: rightIcon ? theme.spacing.sm : 0,
+    paddingVertical: 0,
   };
 
   const labelStyle: TextStyle = {
-    ...theme.typography.bodySmall,
-    color: error ? theme.colors.error.main : theme.colors.text.secondary,
-    marginBottom: theme.spacing.xs,
-    fontWeight: theme.typography.fontWeight.medium,
+    fontSize: 13,
+    fontWeight: '600',
+    color: error ? theme.colors.error.main : theme.colors.text.tertiary,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+    marginBottom: theme.spacing.sm,
   };
 
   const helperTextStyle: TextStyle = {
-    ...theme.typography.caption,
+    fontSize: 13,
     color: error ? theme.colors.error.main : theme.colors.text.tertiary,
-    marginTop: theme.spacing.xs,
+    marginTop: theme.spacing.sm,
   };
 
   const handleFocus = (e: any) => {
