@@ -3,7 +3,7 @@
  * Main navigation configuration for the app
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
@@ -12,9 +12,35 @@ import { colors } from '../constants/theme';
 import { LandingScreen } from '../screens/Landing';
 import { SearchResultsScreen } from '../screens/SearchResults';
 import { CompassScreen } from '../screens/Compass';
-import { SettingsScreen } from '../screens/Settings';
-import { OnboardingScreen } from '../screens/Onboarding';
 import { isOnboardingComplete } from '../utils/onboarding';
+
+// Lazy load screens that are not immediately needed
+const LazySettingsScreen = React.lazy(() =>
+  import('../screens/Settings').then(module => ({ default: module.SettingsScreen })),
+);
+const LazyOnboardingScreen = React.lazy(() =>
+  import('../screens/Onboarding').then(module => ({ default: module.OnboardingScreen })),
+);
+
+// Suspense wrapper for lazy-loaded screens
+const ScreenLoader: React.FC = () => (
+  <View style={styles.loadingContainer}>
+    <ActivityIndicator size="large" color={colors.accent.primary} />
+  </View>
+);
+
+// Wrapped lazy components with Suspense
+const SettingsScreen = (props: any) => (
+  <Suspense fallback={<ScreenLoader />}>
+    <LazySettingsScreen {...props} />
+  </Suspense>
+);
+
+const OnboardingScreen = (props: any) => (
+  <Suspense fallback={<ScreenLoader />}>
+    <LazyOnboardingScreen {...props} />
+  </Suspense>
+);
 
 const Stack = createStackNavigator<RootStackParamList>();
 

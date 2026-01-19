@@ -1,7 +1,7 @@
 # FaceIt - Global Orientation Mobile App
 
 ![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20Android-blue)
-![React Native](https://img.shields.io/badge/React%20Native-0.73+-61DAFB?logo=react)
+![React Native](https://img.shields.io/badge/React%20Native-0.83+-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -33,14 +33,16 @@ A beautiful, modern mobile application that helps users physically orient themse
 ## 🛠 Tech Stack
 
 ### Frontend
-- **Framework**: React Native 0.73+ (Cross-platform iOS/Android)
-- **Language**: TypeScript 5.x
-- **Navigation**: React Navigation 6.x
-- **Animations**: React Native Reanimated 2.x/3.x (60fps compass rotation)
+
+- **Framework**: React Native 0.83+ (Cross-platform iOS/Android)
+- **Language**: TypeScript 5.x (strict mode)
+- **Navigation**: React Navigation 7.x
+- **Animations**: React Native Reanimated 4.x (60fps compass rotation)
 - **State Management**: React Context API + Hooks
 - **Styling**: React Native StyleSheet API + Custom Dark Theme
 
 ### Services & APIs
+
 - **Geocoding**: Google Maps Geocoding API (primary), Mapbox (fallback)
 - **Analytics**: Firebase Analytics
 - **Crash Reporting**: Firebase Crashlytics
@@ -48,11 +50,13 @@ A beautiful, modern mobile application that helps users physically orient themse
 - **Local Storage**: AsyncStorage / MMKV
 
 ### Device Integration
+
 - **Sensors**: react-native-sensors (Magnetometer, Accelerometer, Gyroscope)
 - **Geolocation**: react-native-geolocation-service
 - **Haptic Feedback**: Native haptic APIs
 
 ### Development & Testing
+
 - **Testing**: Jest + React Native Testing Library
 - **E2E Testing**: Detox (optional)
 - **Linting**: ESLint + Prettier
@@ -114,6 +118,9 @@ npm test
 
 # Run linting
 npm run lint
+
+# Type checking
+npm run type-check
 ```
 
 ---
@@ -182,6 +189,7 @@ npm run test:e2e
 ```
 
 **Testing Requirements**:
+
 - Services: >80% coverage
 - Components: >70% coverage
 - Critical calculations: 100% coverage
@@ -217,12 +225,14 @@ fastlane release
 ## 🗺 Roadmap
 
 ### Phase 1: MVP (Weeks 0-24) ✅ In Progress
+
 - Core location search and compass orientation
 - Recent history and popular locations
 - Dark theme UI with gradient accents
 - iOS and Android App Store launch
 
 ### Phase 2: Enhancement (Months 6-12)
+
 - Search autocomplete/suggestions
 - Saved favorites with custom labels
 - Onboarding tutorial
@@ -231,6 +241,7 @@ fastlane release
 - Accessibility improvements
 
 ### Phase 3: Scale & Monetization (Months 12-24)
+
 - Premium features
 - AR mode (simple direction overlay)
 - Social sharing
@@ -241,20 +252,21 @@ fastlane release
 
 ## 📊 Success Metrics
 
-| Metric | Target |
-|--------|--------|
+| Metric                     | Target              |
+| -------------------------- | ------------------- |
 | Monthly Active Users (MAU) | 100,000 by Month 12 |
-| App Store Rating | 4.5+ stars |
-| Crash-Free Sessions | >99.5% |
-| Bearing Accuracy | <1° error for 95% |
-| App Launch Time | <2 seconds |
-| Compass Update Rate | 10-30 FPS |
+| App Store Rating           | 4.5+ stars          |
+| Crash-Free Sessions        | >99.5%              |
+| Bearing Accuracy           | <1° error for 95%   |
+| App Launch Time            | <2 seconds          |
+| Compass Update Rate        | 10-30 FPS           |
 
 ---
 
 ## 🤝 Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for details on:
+
 - Code style guidelines
 - Git workflow (feature branches, PR process)
 - Testing requirements
@@ -287,4 +299,4 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 **Built with ❤️ using React Native**
 
-*FaceIt - Face any location on Earth*
+_FaceIt - Face any location on Earth_
