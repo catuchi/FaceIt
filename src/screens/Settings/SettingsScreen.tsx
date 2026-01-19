@@ -109,6 +109,8 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
     try {
       const prefs = await storageService.getPreferences();
       setPreferences(prefs);
+      // Sync user property with current preference
+      Analytics.setDistanceUnit(prefs.distanceUnit);
     } catch (error) {
       console.error('[SettingsScreen] Failed to load preferences:', error);
     }
@@ -125,6 +127,8 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
         oldValue,
         newValue: unit,
       });
+      // Set user property for analytics segmentation
+      Analytics.setDistanceUnit(unit);
     } catch (error) {
       console.error('[SettingsScreen] Failed to update distance unit:', error);
     }

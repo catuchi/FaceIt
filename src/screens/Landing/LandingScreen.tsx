@@ -17,74 +17,46 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScreenProps } from '../../navigation/types';
 import { colors, spacing, typography, borderRadius } from '../../constants/theme';
 import { storageService } from '../../services/storage';
+import {
+  PopularLocationsService,
+  PopularLocation,
+} from '../../services/remoteConfig/PopularLocationsService';
 import { Location } from '../../types/storage';
 import { Analytics, ScreenNames } from '../../utils';
 
-// Hardcoded popular locations
-const POPULAR_LOCATIONS = [
-  {
-    id: 'mecca',
-    name: 'Mecca',
-    subtitle: 'Saudi Arabia',
-    coordinates: { latitude: 21.4225, longitude: 39.8262, timestamp: Date.now() },
-    address: 'Mecca, Saudi Arabia',
-    emoji: '🕋',
-  },
-  {
-    id: 'eiffel_tower',
-    name: 'Eiffel Tower',
-    subtitle: 'Paris, France',
-    coordinates: { latitude: 48.8584, longitude: 2.2945, timestamp: Date.now() },
-    address: 'Paris, France',
-    emoji: '🗼',
-  },
-  {
-    id: 'statue_liberty',
-    name: 'Statue of Liberty',
-    subtitle: 'New York, USA',
-    coordinates: { latitude: 40.6892, longitude: -74.0445, timestamp: Date.now() },
-    address: 'New York, USA',
-    emoji: '🗽',
-  },
-  {
-    id: 'taj_mahal',
-    name: 'Taj Mahal',
-    subtitle: 'Agra, India',
-    coordinates: { latitude: 27.1751, longitude: 78.0421, timestamp: Date.now() },
-    address: 'Agra, India',
-    emoji: '🏛️',
-  },
-  {
-    id: 'christ_redeemer',
-    name: 'Christ Redeemer',
-    subtitle: 'Rio, Brazil',
-    coordinates: { latitude: -22.9519, longitude: -43.2105, timestamp: Date.now() },
-    address: 'Rio de Janeiro, Brazil',
-    emoji: '⛪',
-  },
-  {
-    id: 'great_wall',
-    name: 'Great Wall',
-    subtitle: 'China',
-    coordinates: { latitude: 40.4319, longitude: 116.5704, timestamp: Date.now() },
-    address: 'Beijing, China',
-    emoji: '🏯',
-  },
-];
+const TOTAL_SEARCHES_KEY = '@faceit:total_searches';
 
 type Props = ScreenProps<'Landing'>;
 
 export const LandingScreen: React.FC<Props> = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [recentHistory, setRecentHistory] = useState<Location[]>([]);
+  const [popularLocations, setPopularLocations] = useState<PopularLocation[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const [isLoadingPopular, setIsLoadingPopular] = useState(true);
 
   useEffect(() => {
     loadRecentHistory();
+    loadPopularLocations();
   }, []);
+
+  const loadPopularLocations = async () => {
+    try {
+      setIsLoadingPopular(true);
+      const locations = await PopularLocationsService.getPopularLocations();
+      setPopularLocations(locations);
+    } catch (error) {
+      console.error('[LandingScreen] Failed to load popular locations:', error);
+      // Fall back to defaults
+      setPopularLocations(PopularLocationsService.getDefaultLocations());
+    } finally {
+      setIsLoadingPopular(false);
+    }
+  };
 
   // Reload history and track screen view when screen comes into focus
   useEffect(() => {
@@ -107,10 +79,21 @@ export const LandingScreen: React.FC<Props> = ({ navigation }) => {
     }
   };
 
-  const handleSearch = useCallback(() => {
+  const handleSearch = useCallback(async () => {
     if (searchQuery.trim().length === 0) return;
     Keyboard.dismiss();
     Analytics.logSearch({ query: searchQuery.trim() });
+
+    // Increment and track total searches
+    try {
+      const currentCount = await AsyncStorage.getItem(TOTAL_SEARCHES_KEY);
+      const newCount = (parseInt(currentCount || '0', 10) || 0) + 1;
+      await AsyncStorage.setItem(TOTAL_SEARCHES_KEY, newCount.toString());
+      Analytics.setTotalSearches(newCount);
+    } catch (error) {
+      console.warn('[LandingScreen] Failed to track total searches:', error);
+    }
+
     navigation.navigate('SearchResults', { query: searchQuery.trim() });
   }, [searchQuery, navigation]);
 
@@ -122,7 +105,7 @@ export const LandingScreen: React.FC<Props> = ({ navigation }) => {
   );
 
   const handlePopularPress = useCallback(
-    (popular: (typeof POPULAR_LOCATIONS)[0]) => {
+    (popular: PopularLocation) => {
       navigation.navigate('Compass', {
         location: {
           id: popular.id,
@@ -249,28 +232,34 @@ export const LandingScreen: React.FC<Props> = ({ navigation }) => {
           {/* Popular Locations */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Popular Destinations</Text>
-            <View style={styles.popularGrid}>
-              {POPULAR_LOCATIONS.map(popular => (
-                <TouchableOpacity
-                  key={popular.id}
-                  style={styles.popularCard}
-                  onPress={() => handlePopularPress(popular)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.popularEmoji}>
-                    <Text style={styles.popularEmojiText}>{popular.emoji}</Text>
-                  </View>
-                  <View style={styles.popularInfo}>
-                    <Text style={styles.popularName} numberOfLines={1}>
-                      {popular.name}
-                    </Text>
-                    <Text style={styles.popularSubtitle} numberOfLines={1}>
-                      {popular.subtitle}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
+            {isLoadingPopular ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color={colors.accent.primary} />
+              </View>
+            ) : (
+              <View style={styles.popularGrid}>
+                {popularLocations.map(popular => (
+                  <TouchableOpacity
+                    key={popular.id}
+                    style={styles.popularCard}
+                    onPress={() => handlePopularPress(popular)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.popularEmoji}>
+                      <Text style={styles.popularEmojiText}>{popular.emoji}</Text>
+                    </View>
+                    <View style={styles.popularInfo}>
+                      <Text style={styles.popularName} numberOfLines={1}>
+                        {popular.name}
+                      </Text>
+                      <Text style={styles.popularSubtitle} numberOfLines={1}>
+                        {popular.subtitle}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
           </View>
 
           {/* Tip Card */}

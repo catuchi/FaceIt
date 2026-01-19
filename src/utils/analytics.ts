@@ -240,6 +240,31 @@ export const Analytics = {
       console.warn('[Analytics] Failed to set analytics collection:', error);
     }
   },
+
+  // ========================
+  // User Properties
+  // ========================
+
+  /**
+   * Set distance unit preference
+   */
+  async setDistanceUnit(unit: 'km' | 'mi'): Promise<void> {
+    await this.setUserProperty('distance_unit', unit);
+  },
+
+  /**
+   * Set first launch date (ISO string)
+   */
+  async setFirstLaunchDate(date: string): Promise<void> {
+    await this.setUserProperty('first_launch_date', date);
+  },
+
+  /**
+   * Set total searches count
+   */
+  async setTotalSearches(count: number): Promise<void> {
+    await this.setUserProperty('total_searches', count.toString());
+  },
 };
 
 export default Analytics;

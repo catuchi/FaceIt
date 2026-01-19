@@ -5,3 +5,4 @@
 export * from './formatters';
 export * from './gradients';
 export * from './analytics';
+export * from './crashlytics';
