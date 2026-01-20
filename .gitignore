@@ -113,6 +113,10 @@ yarn-error.log
 google-play-service-account.json
 AuthKey_*.p8
 
+# Android keystore credentials
+android/keystore.properties
+KEYSTORE_CREDENTIALS.txt
+
 # Planning Documents (internal use)
 plan.md
 prd.md

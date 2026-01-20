@@ -38,7 +38,8 @@
     "version:patch": "node scripts/set-version.js --bump patch",
     "version:minor": "node scripts/set-version.js --bump minor",
     "version:major": "node scripts/set-version.js --bump major",
-    "prebuild": "npm run version:sync"
+    "prebuild": "npm run version:sync",
+    "generate:icons": "node scripts/generate-icons.js"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
@@ -87,6 +88,7 @@
     "lint-staged": "^16.2.7",
     "prettier": "^3.8.0",
     "react-test-renderer": "19.2.0",
+    "sharp": "^0.34.5",
     "typescript": "^5.8.3"
   },
   "engines": {
