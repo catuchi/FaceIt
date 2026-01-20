@@ -1,6 +1,6 @@
 {
   "name": "faceit",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "description": "A React Native mobile app that helps users physically orient themselves to face any location in the world using real-time compass guidance powered by device sensors.",
   "author": "Chibu Atuche",
@@ -32,7 +32,13 @@
     "clean": "rm -rf node_modules && npm install",
     "clean:ios": "cd ios && pod install && cd ..",
     "clean:android": "cd android && ./gradlew clean && cd ..",
-    "prepare": "husky"
+    "prepare": "husky",
+    "version:sync": "node scripts/set-version.js",
+    "version:set": "node scripts/set-version.js",
+    "version:patch": "node scripts/set-version.js --bump patch",
+    "version:minor": "node scripts/set-version.js --bump minor",
+    "version:major": "node scripts/set-version.js --bump major",
+    "prebuild": "npm run version:sync"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
