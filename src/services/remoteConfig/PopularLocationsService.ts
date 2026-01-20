@@ -19,15 +19,6 @@ export interface PopularLocation {
 // Default popular locations (fallback)
 const DEFAULT_POPULAR_LOCATIONS: PopularLocation[] = [
   {
-    id: 'mecca',
-    name: 'Mecca',
-    subtitle: 'Saudi Arabia',
-    coordinates: { latitude: 21.4225, longitude: 39.8262, timestamp: Date.now() },
-    address: 'Mecca, Saudi Arabia',
-    emoji: '🕋',
-    category: 'religious',
-  },
-  {
     id: 'eiffel_tower',
     name: 'Eiffel Tower',
     subtitle: 'Paris, France',

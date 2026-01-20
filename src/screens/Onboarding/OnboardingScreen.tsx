@@ -320,16 +320,20 @@ const styles = StyleSheet.create({
   },
   footer: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.lg,
+    paddingBottom: spacing.xl,
+    minHeight: 80,
   },
   primaryButton: {
     borderRadius: borderRadius.pill,
     overflow: 'hidden',
+    backgroundColor: colors.accent.primary,
+    minHeight: 56,
   },
   primaryButtonGradient: {
     paddingVertical: spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
+    minHeight: 56,
   },
   primaryButtonText: {
     fontSize: 17,
