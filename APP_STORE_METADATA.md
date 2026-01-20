@@ -139,11 +139,11 @@ Same as iPhone screenshots
 
 ## Privacy Policy URL
 
-`https://[your-domain]/privacy`
+`https://catuchi.github.io/FaceIt/privacy.html`
 
 ## Terms of Service URL
 
-`https://[your-domain]/terms`
+`https://catuchi.github.io/FaceIt/terms.html`
 
 ## Support URL
 

@@ -5,7 +5,16 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Switch,
+  Alert,
+  Linking,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 import { ScreenProps } from '../../navigation/types';
@@ -176,25 +185,56 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
     );
   }, []);
 
-  const handleOpenPrivacyPolicy = useCallback(() => {
-    Alert.alert(
-      'Privacy Policy',
-      'Privacy policy will be available at launch.\n\nFaceIt stores all data locally on your device. We do not collect or share your personal information.',
-    );
+  const handleOpenPrivacyPolicy = useCallback(async () => {
+    const url = 'https://catuchi.github.io/FaceIt/privacy.html';
+    try {
+      const canOpen = await Linking.canOpenURL(url);
+      if (canOpen) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert('Error', 'Unable to open Privacy Policy. Please visit: ' + url);
+      }
+    } catch (error) {
+      console.error('[SettingsScreen] Failed to open Privacy Policy:', error);
+      Alert.alert('Error', 'Failed to open Privacy Policy.');
+    }
   }, []);
 
-  const handleOpenTerms = useCallback(() => {
-    Alert.alert(
-      'Terms of Service',
-      'Terms of service will be available at launch.\n\nFaceIt is provided as-is for orientation purposes. Not intended for critical navigation.',
-    );
+  const handleOpenTerms = useCallback(async () => {
+    const url = 'https://catuchi.github.io/FaceIt/terms.html';
+    try {
+      const canOpen = await Linking.canOpenURL(url);
+      if (canOpen) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert('Error', 'Unable to open Terms of Service. Please visit: ' + url);
+      }
+    } catch (error) {
+      console.error('[SettingsScreen] Failed to open Terms of Service:', error);
+      Alert.alert('Error', 'Failed to open Terms of Service.');
+    }
   }, []);
 
-  const handleOpenHelp = useCallback(() => {
-    Alert.alert(
-      'Help & Support',
-      'Need help?\n\n1. Search for any location in the world\n2. Face the direction shown on the compass\n3. Use favorites to save important locations\n\nFor support, contact: support@faceit.app',
-    );
+  const handleOpenHelp = useCallback(async () => {
+    const url = 'https://github.com/catuchi/FaceIt/issues';
+    try {
+      const canOpen = await Linking.canOpenURL(url);
+      if (canOpen) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert(
+          'Help & Support',
+          'Need help?\n\n1. Search for any location in the world\n2. Face the direction shown on the compass\n3. Use favorites to save important locations\n\nFor support, visit: ' +
+            url,
+        );
+      }
+    } catch (error) {
+      console.error('[SettingsScreen] Failed to open Help:', error);
+      Alert.alert(
+        'Help & Support',
+        'Need help?\n\n1. Search for any location in the world\n2. Face the direction shown on the compass\n3. Use favorites to save important locations\n\nFor support, email: support@faceit.app',
+      );
+    }
   }, []);
 
   const getDistanceUnitLabel = (unit: 'km' | 'mi'): string => {
