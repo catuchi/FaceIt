@@ -264,8 +264,8 @@ describe('LocationService', () => {
     });
 
     it('should throw TIMEOUT error on timeout', async () => {
-      mockGeolocation.getCurrentPosition.mockImplementationOnce((_, error) => {
-        error({ code: 3, message: 'Timeout' });
+      mockGeolocation.getCurrentPosition.mockImplementationOnce((_, error?) => {
+        error?.({ code: 3, message: 'Timeout' });
       });
 
       await expect(locationService.getCurrentLocation()).rejects.toMatchObject({
@@ -274,8 +274,8 @@ describe('LocationService', () => {
     });
 
     it('should throw POSITION_UNAVAILABLE error', async () => {
-      mockGeolocation.getCurrentPosition.mockImplementationOnce((_, error) => {
-        error({ code: 2, message: 'Position unavailable' });
+      mockGeolocation.getCurrentPosition.mockImplementationOnce((_, error?) => {
+        error?.({ code: 2, message: 'Position unavailable' });
       });
 
       await expect(locationService.getCurrentLocation()).rejects.toMatchObject({
@@ -284,8 +284,8 @@ describe('LocationService', () => {
     });
 
     it('should throw PLAY_SERVICES_NOT_AVAILABLE error', async () => {
-      mockGeolocation.getCurrentPosition.mockImplementationOnce((_, error) => {
-        error({ code: 4, message: 'Play Services not available' });
+      mockGeolocation.getCurrentPosition.mockImplementationOnce((_, error?) => {
+        error?.({ code: 4, message: 'Play Services not available' });
       });
 
       await expect(locationService.getCurrentLocation()).rejects.toMatchObject({
@@ -294,8 +294,8 @@ describe('LocationService', () => {
     });
 
     it('should throw SETTINGS_NOT_SATISFIED error', async () => {
-      mockGeolocation.getCurrentPosition.mockImplementationOnce((_, error) => {
-        error({ code: 5, message: 'Settings not satisfied' });
+      mockGeolocation.getCurrentPosition.mockImplementationOnce((_, error?) => {
+        error?.({ code: 5, message: 'Settings not satisfied' });
       });
 
       await expect(locationService.getCurrentLocation()).rejects.toMatchObject({
@@ -472,8 +472,8 @@ describe('LocationService', () => {
       mockGeolocation.requestAuthorization.mockResolvedValue('granted');
 
       // Make getCurrentPosition fail
-      mockGeolocation.getCurrentPosition.mockImplementationOnce((_, error) => {
-        error({ code: 3, message: 'Timeout' });
+      mockGeolocation.getCurrentPosition.mockImplementationOnce((_, error?) => {
+        error?.({ code: 3, message: 'Timeout' });
       });
 
       // Have cached location available
@@ -501,8 +501,8 @@ describe('LocationService', () => {
       mockGeolocation.requestAuthorization.mockResolvedValue('granted');
 
       // Make getCurrentPosition fail
-      mockGeolocation.getCurrentPosition.mockImplementationOnce((_, error) => {
-        error({ code: 3, message: 'Timeout' });
+      mockGeolocation.getCurrentPosition.mockImplementationOnce((_, error?) => {
+        error?.({ code: 3, message: 'Timeout' });
       });
 
       // No cached location

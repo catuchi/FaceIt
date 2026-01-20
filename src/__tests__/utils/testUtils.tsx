@@ -91,6 +91,8 @@ export function toJSON(renderer: ReactTestRenderer): object | null {
  * Check if component contains text
  */
 export function hasText(instance: ReactTestInstance, text: string): boolean {
-  const textNodes = instance.findAll(node => node.type === 'Text' && node.children?.includes(text));
+  const textNodes = instance.findAll(
+    node => (node.type as string) === 'Text' && node.children?.includes(text),
+  );
   return textNodes.length > 0;
 }

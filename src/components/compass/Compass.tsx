@@ -7,14 +7,8 @@
 import React, { useEffect, useMemo, memo } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  interpolate,
-  Extrapolation,
-} from 'react-native-reanimated';
-import { colors, borderRadius } from '@constants/theme';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { colors } from '@constants/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const DEFAULT_COMPASS_SIZE = Math.min(SCREEN_WIDTH * 0.75, 280);
@@ -78,7 +72,7 @@ const CompassComponent: React.FC<CompassProps> = ({
   bearing,
   deviceHeading,
   isAligned,
-  accuracy = 'medium',
+  accuracy: _accuracy = 'medium',
   size = DEFAULT_COMPASS_SIZE,
   showBearing = true,
   showCardinal = false,

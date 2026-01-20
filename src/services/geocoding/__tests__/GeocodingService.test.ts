@@ -340,7 +340,7 @@ describe('GeocodingService', () => {
       (networkError as any).isAxiosError = true;
       (networkError as any).response = undefined;
       mockAxios.get.mockRejectedValueOnce(networkError);
-      mockAxios.isAxiosError = jest.fn().mockReturnValue(true);
+      (mockAxios as any).isAxiosError = jest.fn().mockReturnValue(true);
 
       await expect(geocodingService.searchByText('test')).rejects.toMatchObject({
         type: GeocodingErrorType.NETWORK_ERROR,
@@ -354,7 +354,7 @@ describe('GeocodingService', () => {
       (timeoutError as any).isAxiosError = true;
       (timeoutError as any).code = 'ECONNABORTED';
       mockAxios.get.mockRejectedValueOnce(timeoutError);
-      mockAxios.isAxiosError = jest.fn().mockReturnValue(true);
+      (mockAxios as any).isAxiosError = jest.fn().mockReturnValue(true);
 
       await expect(geocodingService.searchByText('test')).rejects.toMatchObject({
         type: GeocodingErrorType.TIMEOUT,
@@ -368,7 +368,7 @@ describe('GeocodingService', () => {
       (rateLimitError as any).isAxiosError = true;
       (rateLimitError as any).response = { status: 429 };
       mockAxios.get.mockRejectedValueOnce(rateLimitError);
-      mockAxios.isAxiosError = jest.fn().mockReturnValue(true);
+      (mockAxios as any).isAxiosError = jest.fn().mockReturnValue(true);
 
       await expect(geocodingService.searchByText('test')).rejects.toMatchObject({
         type: GeocodingErrorType.RATE_LIMIT,
@@ -378,7 +378,7 @@ describe('GeocodingService', () => {
     it('should handle unknown errors', async () => {
       mockAsyncStorage.getItem.mockResolvedValue(null);
       mockAxios.get.mockRejectedValueOnce(new Error('Unknown error'));
-      mockAxios.isAxiosError = jest.fn().mockReturnValue(false);
+      (mockAxios as any).isAxiosError = jest.fn().mockReturnValue(false);
 
       await expect(geocodingService.searchByText('test')).rejects.toMatchObject({
         type: GeocodingErrorType.UNKNOWN,

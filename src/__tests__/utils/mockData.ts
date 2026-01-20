@@ -62,6 +62,7 @@ export const createMockFavoriteLocation = (
 export const createMockGeocodingResult = (
   overrides?: Partial<GeocodingResult>,
 ): GeocodingResult => ({
+  id: `geocoding_${Date.now()}`,
   name: 'Test Place',
   address: '123 Test Street, Test City, TC 12345',
   coordinates: {

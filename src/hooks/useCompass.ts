@@ -4,7 +4,7 @@
  * Handles location, bearing calculation, sensor tracking, and alignment detection
  */
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import { LocationService } from '../services/location/LocationService';
 import { SensorService } from '../services/sensors/SensorService';
