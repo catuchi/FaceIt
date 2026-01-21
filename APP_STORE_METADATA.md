@@ -153,8 +153,8 @@ Same as iPhone screenshots
 
 ## Bundle Identifiers
 
-- **iOS**: `org.reactjs.native.example.FaceItTemp` (update to `com.yourcompany.faceit`)
-- **Android**: `com.faceittemp` (update to `com.yourcompany.faceit`)
+- **iOS**: `com.faceit.app`
+- **Android**: `com.faceit.app`
 
 ## Version
 

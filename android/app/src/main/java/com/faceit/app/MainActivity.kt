@@ -1,4 +1,4 @@
-package com.faceittemp
+package com.faceit.app
 
 import android.os.Bundle
 import com.facebook.react.ReactActivity

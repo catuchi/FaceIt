@@ -6,15 +6,24 @@
 
 **Phase 10 of 13**: App Store Preparation
 
+**Completed in Phase 10**:
+
+- App icons created (iOS 1024x1024, Android 512x512 adaptive)
+- Privacy Policy & Terms of Service hosted on GitHub Pages
+- App store metadata written (APP_STORE_METADATA.md)
+- Screenshot guide created (SCREENSHOTS_GUIDE.md)
+- Production build configs ready (v1.0.0)
+- Bundle identifiers updated to `com.faceit.app` (iOS & Android)
+
 **Next tasks** (read `plan.md` for full details):
 
-1. Create app icons (1024x1024 iOS, 512x512 + adaptive Android)
-2. Create screenshots for all required device sizes
-3. Write and host Privacy Policy & Terms of Service
-4. Configure API key restrictions in Google Cloud Console
-5. Generate production builds (iOS archive, Android AAB)
+1. Capture screenshots for all required device sizes (see SCREENSHOTS_GUIDE.md)
+2. Configure API key restrictions in Google Cloud Console (manual)
+3. Create App Store Connect & Play Console accounts (manual)
+4. Set up signing certificates and provisioning profiles
+5. Archive and upload builds
 
-**Completed**: Phases 1-8 (Foundation, Design System, Core Services, Navigation, Compass, Firebase, Testing, Performance)
+**Completed**: Phases 1-9 (Foundation, Design System, Core Services, Navigation, Compass, Firebase, Testing, Performance, Security)
 
 **Test Coverage**: 163 tests passing, 75-98% coverage on services
 
@@ -103,6 +112,8 @@ For detailed info, read these files when needed:
 
 - `plan.md` - Full 13-phase roadmap with 350+ tasks
 - `prd.md` - Product requirements, user stories, specifications
+- `APP_STORE_METADATA.md` - App store descriptions, keywords, categories
+- `SCREENSHOTS_GUIDE.md` - Screenshot specs and capture instructions
 
 ---
 
