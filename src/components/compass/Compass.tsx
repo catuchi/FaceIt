@@ -1,20 +1,24 @@
 /**
  * Compass Component
- * Reusable compass visual with smooth 60fps Reanimated animations
- * Design: Flighty-inspired dark UI with teal-cyan gradient accents
+ * Clean, modern compass with diamond needle design
+ * Inspired by minimalist compass UI with smooth 60fps animations
  */
 
 import React, { useEffect, useMemo, memo } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import Svg, { Path, Circle, Line, G } from 'react-native-svg';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  useAnimatedProps,
+} from 'react-native-reanimated';
 import { colors } from '@constants/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const DEFAULT_COMPASS_SIZE = Math.min(SCREEN_WIDTH * 0.75, 280);
+const DEFAULT_COMPASS_SIZE = Math.min(SCREEN_WIDTH * 0.7, 260);
 
-// Static tick positions - defined outside component to avoid recreation
-const TICK_DEGREES = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330] as const;
+const AnimatedG = Animated.createAnimatedComponent(G);
 
 export interface CompassProps {
   /** Target bearing in degrees (0-360) */
@@ -25,7 +29,7 @@ export interface CompassProps {
   isAligned: boolean;
   /** Sensor accuracy level */
   accuracy?: 'low' | 'medium' | 'high';
-  /** Size of the compass in points (default: 280) */
+  /** Size of the compass in points (default: 260) */
   size?: number;
   /** Show center bearing display */
   showBearing?: boolean;
@@ -82,10 +86,7 @@ const CompassComponent: React.FC<CompassProps> = ({
 
   // Update rotation when bearing or heading changes
   useEffect(() => {
-    // Calculate target rotation (needle points to bearing relative to device heading)
     const targetRotation = normalizeAngle(bearing - deviceHeading);
-
-    // Animate to new rotation with spring physics
     rotation.value = withSpring(targetRotation, {
       damping: 15,
       stiffness: 100,
@@ -93,130 +94,167 @@ const CompassComponent: React.FC<CompassProps> = ({
     });
   }, [bearing, deviceHeading, rotation]);
 
-  // Animated style for needle rotation
-  const needleAnimatedStyle = useAnimatedStyle(() => {
+  // Animated style for needle rotation (for the View wrapper)
+  const needleAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
+
+  // Memoize calculated sizes
+  const sizes = useMemo(() => {
+    const center = size / 2;
+    const radius = size / 2 - 8;
     return {
-      transform: [{ rotate: `${rotation.value}deg` }],
+      size,
+      center,
+      radius,
+      tickOuterRadius: radius - 4,
+      tickInnerRadiusMajor: radius - 16,
+      tickInnerRadiusMinor: radius - 10,
+      needleLength: radius * 0.65,
+      needleWidth: 12,
     };
-  });
+  }, [size]);
 
-  // Memoize calculated sizes to avoid recalculation on every render
-  const sizes = useMemo(
-    () => ({
-      compassSize: size,
-      borderWidth: 4,
-      outerSize: size + 4 * 2,
-      needleLength: size * 0.35,
-      needleWidth: 6,
-      tickOffset: size / 2 - 20,
-    }),
-    [size],
-  );
+  const {
+    center,
+    radius,
+    tickOuterRadius,
+    tickInnerRadiusMajor,
+    tickInnerRadiusMinor,
+    needleLength,
+    needleWidth,
+  } = sizes;
 
-  // Destructure memoized sizes
-  const { compassSize, borderWidth, outerSize, needleLength, needleWidth, tickOffset } = sizes;
+  // Generate tick marks
+  const ticks = useMemo(() => {
+    const tickElements = [];
+    for (let i = 0; i < 72; i++) {
+      const angle = (i * 5 * Math.PI) / 180;
+      const isMajor = i % 6 === 0; // Every 30 degrees
+      const isCardinal = i % 18 === 0; // Every 90 degrees
+      const innerRadius = isMajor ? tickInnerRadiusMajor : tickInnerRadiusMinor;
 
-  const renderCompassFace = () => (
-    <View
-      style={[
-        styles.compassInner,
-        { width: compassSize, height: compassSize, borderRadius: compassSize / 2 },
-      ]}
-    >
-      {/* Cardinal Markers */}
-      <Text style={[styles.cardinal, styles.cardinalN, { top: 24 }]}>N</Text>
-      <Text style={[styles.cardinal, styles.cardinalE, { right: 24 }]}>E</Text>
-      <Text style={[styles.cardinal, styles.cardinalS, { bottom: 24 }]}>S</Text>
-      <Text style={[styles.cardinal, styles.cardinalW, { left: 24 }]}>W</Text>
+      const x1 = center + tickOuterRadius * Math.sin(angle);
+      const y1 = center - tickOuterRadius * Math.cos(angle);
+      const x2 = center + innerRadius * Math.sin(angle);
+      const y2 = center - innerRadius * Math.cos(angle);
 
-      {/* Degree Ticks */}
-      {TICK_DEGREES.map(deg => (
-        <View
-          key={deg}
-          style={[
-            styles.tick,
-            {
-              transform: [{ rotate: `${deg}deg` }, { translateY: -tickOffset }],
-            },
-            deg % 90 === 0 ? styles.tickMajor : styles.tickMinor,
-          ]}
-        />
-      ))}
+      tickElements.push(
+        <Line
+          key={i}
+          x1={x1}
+          y1={y1}
+          x2={x2}
+          y2={y2}
+          stroke={
+            isCardinal
+              ? colors.text.secondary
+              : isMajor
+                ? colors.text.tertiary
+                : colors.border.medium
+          }
+          strokeWidth={isCardinal ? 2 : isMajor ? 1.5 : 1}
+          strokeLinecap="round"
+        />,
+      );
+    }
+    return tickElements;
+  }, [center, tickOuterRadius, tickInnerRadiusMajor, tickInnerRadiusMinor]);
 
-      {/* Animated Needle */}
-      <Animated.View
-        style={[
-          styles.needle,
-          {
-            width: needleWidth,
-            height: needleLength,
-            top: compassSize * 0.15,
-          },
-          needleAnimatedStyle,
-        ]}
-      >
-        <LinearGradient
-          colors={[colors.gradient.start, colors.gradient.end]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={[styles.needleGradient, { width: needleWidth, borderRadius: needleWidth / 2 }]}
-        />
-        <View
-          style={[
-            styles.needleTip,
-            { borderLeftWidth: needleWidth, borderRightWidth: needleWidth },
-          ]}
-        />
-      </Animated.View>
+  // Diamond needle path - pointing up
+  const needlePath = useMemo(() => {
+    const tipY = -needleLength;
+    const baseY = needleLength * 0.3;
+    const width = needleWidth / 2;
 
-      {/* Center Display */}
-      {showBearing && (
-        <View style={styles.centerDisplay}>
-          <Text style={styles.bearingLarge}>{Math.round(bearing)}°</Text>
-          {showCardinal && <Text style={styles.cardinalLabel}>{bearingToCardinal(bearing)}</Text>}
-        </View>
-      )}
-    </View>
-  );
+    return `M 0 ${tipY} L ${width} 0 L 0 ${baseY} L -${width} 0 Z`;
+  }, [needleLength, needleWidth]);
+
+  // Bottom needle path (opposite direction, lighter color)
+  const needleBottomPath = useMemo(() => {
+    const tipY = needleLength * 0.8;
+    const baseY = needleLength * 0.1;
+    const width = needleWidth / 2 - 2;
+
+    return `M 0 ${tipY} L ${width} ${baseY} L 0 0 L -${width} ${baseY} Z`;
+  }, [needleLength, needleWidth]);
 
   return (
     <View
-      style={[styles.compassContainer, { width: outerSize, height: outerSize }]}
+      style={[styles.container, { width: size, height: size }]}
       accessible={true}
       accessibilityLabel={`Bearing ${Math.round(bearing)} degrees ${bearingToCardinal(bearing)}. ${isAligned ? 'Aligned with target' : 'Rotate to align'}`}
       accessibilityRole="image"
-      accessibilityHint="Compass showing direction to target location"
     >
-      {isAligned ? (
-        <LinearGradient
-          colors={[colors.gradient.start, colors.gradient.end]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[
-            styles.compassGradientBorder,
-            {
-              width: outerSize,
-              height: outerSize,
-              borderRadius: outerSize / 2,
-              padding: borderWidth,
-            },
-          ]}
-        >
-          {renderCompassFace()}
-        </LinearGradient>
-      ) : (
-        <View
-          style={[
-            styles.compassBorder,
-            {
-              width: outerSize,
-              height: outerSize,
-              borderRadius: outerSize / 2,
-              padding: borderWidth,
-            },
-          ]}
-        >
-          {renderCompassFace()}
+      {/* SVG Compass Face */}
+      <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {/* Outer ring */}
+        <Circle
+          cx={center}
+          cy={center}
+          r={radius}
+          fill={colors.background.secondary}
+          stroke={isAligned ? colors.accent.primary : colors.background.tertiary}
+          strokeWidth={isAligned ? 3 : 2}
+        />
+
+        {/* Inner subtle ring */}
+        <Circle
+          cx={center}
+          cy={center}
+          r={radius - 20}
+          fill="none"
+          stroke={colors.border.light}
+          strokeWidth={0.5}
+        />
+
+        {/* Tick marks */}
+        {ticks}
+
+        {/* N marker */}
+        <Circle cx={center} cy={center - radius + 28} r={4} fill={colors.accent.primary} />
+      </Svg>
+
+      {/* Animated Needle Layer */}
+      <Animated.View
+        style={[styles.needleContainer, { width: size, height: size }, needleAnimatedStyle]}
+      >
+        <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <G transform={`translate(${center}, ${center})`}>
+            {/* Bottom needle (gray) */}
+            <Path d={needleBottomPath} fill={colors.text.tertiary} />
+
+            {/* Top needle (gradient effect via two overlapping paths) */}
+            <Path d={needlePath} fill={colors.gradient.start} />
+
+            {/* Gradient overlay for depth */}
+            <Path
+              d={`M 0 ${-needleLength} L ${needleWidth / 2} 0 L 0 ${needleLength * 0.15} Z`}
+              fill={colors.gradient.end}
+              opacity={0.6}
+            />
+
+            {/* Center circle */}
+            <Circle
+              cx={0}
+              cy={0}
+              r={8}
+              fill={colors.background.primary}
+              stroke={colors.accent.primary}
+              strokeWidth={2}
+            />
+
+            {/* Inner dot */}
+            <Circle cx={0} cy={0} r={3} fill={colors.accent.primary} />
+          </G>
+        </Svg>
+      </Animated.View>
+
+      {/* Bearing Display */}
+      {showBearing && (
+        <View style={styles.bearingContainer}>
+          <Text style={styles.bearingText}>{Math.round(bearing)}°</Text>
+          {showCardinal && <Text style={styles.cardinalText}>{bearingToCardinal(bearing)}</Text>}
         </View>
       )}
     </View>
@@ -224,87 +262,33 @@ const CompassComponent: React.FC<CompassProps> = ({
 };
 
 const styles = StyleSheet.create({
-  compassContainer: {
+  container: {
     alignItems: 'center',
     justifyContent: 'center',
   },
-  compassGradientBorder: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  compassBorder: {
-    backgroundColor: colors.background.tertiary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  compassInner: {
-    backgroundColor: colors.background.secondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cardinal: {
+  needleContainer: {
     position: 'absolute',
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text.tertiary,
+    top: 0,
+    left: 0,
   },
-  cardinalN: {
-    color: colors.accent.primary,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  cardinalE: {},
-  cardinalS: {},
-  cardinalW: {},
-  tick: {
+  bearingContainer: {
     position: 'absolute',
-    width: 2,
-    backgroundColor: colors.border.medium,
-  },
-  tickMajor: {
-    height: 12,
-    backgroundColor: colors.text.tertiary,
-  },
-  tickMinor: {
-    height: 6,
-  },
-  needle: {
-    position: 'absolute',
+    bottom: '22%',
     alignItems: 'center',
   },
-  needleGradient: {
-    height: '85%',
-  },
-  needleTip: {
-    width: 0,
-    height: 0,
-    borderBottomWidth: 10,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor: colors.gradient.end,
-    marginTop: -2,
-  },
-  centerDisplay: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bearingLarge: {
-    fontSize: 56,
+  bearingText: {
+    fontSize: 42,
     fontWeight: '200',
     color: colors.text.primary,
-    letterSpacing: -2,
+    letterSpacing: -1,
   },
-  cardinalLabel: {
+  cardinalText: {
     fontSize: 14,
     fontWeight: '600',
     color: colors.text.secondary,
-    textTransform: 'uppercase',
-    marginTop: 4,
+    marginTop: 2,
   },
 });
 
-// Memoize component to prevent unnecessary re-renders
 export const Compass = memo(CompassComponent);
-
 export default Compass;

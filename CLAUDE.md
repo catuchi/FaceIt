@@ -106,6 +106,22 @@ npm run type-check # TypeScript check
 - MockSensorService for simulator testing
 - Dark theme only (no light mode in MVP)
 
+## Development Agents
+
+Reusable agents in `.claude/agents/`:
+
+| Agent                       | Use For         | Example Prompt                |
+| --------------------------- | --------------- | ----------------------------- |
+| `pr-review.md`              | Code review     | "Review my staged changes"    |
+| `test-generator.md`         | Create tests    | "Generate tests for [file]"   |
+| `architecture-explainer.md` | Understand code | "Explain how [feature] works" |
+
+For structured output, reference the agent file:
+
+```
+Read .claude/agents/pr-review.md and review the changes in my branch
+```
+
 ## Reference Documents
 
 For detailed info, read these files when needed:

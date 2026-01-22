@@ -84,9 +84,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.faceit.app"
+    namespace "io.faceit.compass"
     defaultConfig {
-        applicationId "com.faceit.app"
+        applicationId "io.faceit.compass"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 28

@@ -90,4 +90,25 @@ platform :ios do
       skip_codesigning: true
     )
   end
+
+  desc "Capture screenshots for App Store"
+  lane :screenshots do
+    capture_screenshots(
+      workspace: "FaceItTemp.xcworkspace",
+      scheme: "FaceItTemp",
+      output_directory: "../screenshots/ios",
+      clear_previous_screenshots: false,
+      reinstall_app: false,
+      stop_after_first_error: true
+    )
+  end
+
+  desc "Frame screenshots with device bezels"
+  lane :frame_screenshots do
+    frame_screenshots(
+      path: "../screenshots/ios",
+      white: false,
+      background_color: "#101010"
+    )
+  end
 end

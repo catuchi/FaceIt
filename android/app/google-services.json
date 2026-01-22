@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:920428763722:android:9bf4159c877d84370724b3",
         "android_client_info": {
-          "package_name": "com.faceit.app"
+          "package_name": "io.faceit.compass"
         }
       },
       "oauth_client": [],

@@ -1,0 +1,30 @@
+# FaceIt Snapshot Configuration
+# Run with: cd ios && fastlane screenshots
+
+# Devices to capture screenshots on
+# Note: Update these based on available Xcode simulators
+devices([
+  "iPhone 17 Pro Max",    # 6.7" display
+  "iPhone 17 Pro"         # 6.1" display (optional)
+])
+
+# Languages to capture
+languages(["en-US"])
+
+# Xcode scheme
+scheme("FaceItTemp")
+
+# Output directory (relative to ios/)
+output_directory("../screenshots/ios")
+
+# Screenshot options
+clear_previous_screenshots(false)
+reinstall_app(false)
+stop_after_first_error(true)
+
+# Erase simulator before running (optional)
+# erase_simulator(true)
+
+# Override status bar (optional - requires iOS 13+)
+# override_status_bar(true)
+# override_status_bar_arguments("--time 9:41 --batteryState charged --batteryLevel 100 --cellularMode active --cellularBars 4")

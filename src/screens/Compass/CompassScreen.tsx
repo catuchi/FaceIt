@@ -36,6 +36,9 @@ export const CompassScreen: React.FC<Props> = ({ route, navigation }) => {
   // Calibration guide state
   const [showCalibrationGuide, setShowCalibrationGuide] = useState(false);
 
+  // DEBUG: Force aligned state for screenshots
+  const [forceAligned, setForceAligned] = useState(false);
+
   // Pulse animation for aligned state
   const pulseScale = useSharedValue(1);
 
@@ -211,31 +214,23 @@ export const CompassScreen: React.FC<Props> = ({ route, navigation }) => {
           <Animated.View style={[styles.compassContainer, pulseAnimatedStyle]}>
             <Compass
               bearing={bearing}
-              deviceHeading={deviceHeading}
-              isAligned={isAligned}
+              deviceHeading={forceAligned ? bearing : deviceHeading}
+              isAligned={forceAligned || isAligned}
               showBearing={true}
               showCardinal={false}
             />
           </Animated.View>
 
-          {/* Instruction */}
-          <View style={styles.instructionContainer}>
-            {isAligned ? (
-              <LinearGradient
-                colors={[colors.gradient.start, colors.gradient.end]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.alignedPill}
-              >
-                <Text style={styles.alignedIcon}>✓</Text>
-                <Text style={styles.alignedText}>Aligned</Text>
-              </LinearGradient>
-            ) : (
-              <View style={styles.instructionPill}>
-                <Text style={styles.instructionText}>Rotate to align</Text>
-              </View>
-            )}
-          </View>
+          {/* Status Button */}
+          {forceAligned || isAligned ? (
+            <View style={styles.alignedButton}>
+              <Text style={styles.alignedButtonText}>✓ Aligned</Text>
+            </View>
+          ) : (
+            <View style={styles.rotateButton}>
+              <Text style={styles.rotateButtonText}>Rotate to align</Text>
+            </View>
+          )}
         </View>
 
         {/* Bottom Card */}
@@ -302,11 +297,17 @@ export const CompassScreen: React.FC<Props> = ({ route, navigation }) => {
           isCalibrated={!needsCalibration}
         />
 
-        {/* Simulator Mode */}
+        {/* Simulator Mode - Tap to toggle aligned state for screenshots */}
         {isSimulatorMode && (
-          <View style={styles.simulatorBanner}>
-            <Text style={styles.simulatorText}>Simulator Mode</Text>
-          </View>
+          <TouchableOpacity
+            onPress={() => setForceAligned(!forceAligned)}
+            style={[styles.simulatorBanner, forceAligned && styles.simulatorBannerActive]}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.simulatorText}>
+              {forceAligned ? '✓ Aligned Mode (tap to reset)' : 'Simulator Mode (tap for aligned)'}
+            </Text>
+          </TouchableOpacity>
         )}
       </SafeAreaView>
     </View>
@@ -353,41 +354,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: spacing.xl,
+    paddingBottom: 180,
   },
   compassContainer: {
-    marginBottom: spacing['2xl'],
+    marginBottom: spacing.md,
   },
-  instructionContainer: {
-    marginTop: spacing.lg,
+  alignedButton: {
+    backgroundColor: colors.accent.primary,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 28,
+    marginTop: 24,
   },
-  instructionPill: {
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.pill,
-  },
-  instructionText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    fontWeight: '500',
-  },
-  alignedPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.md,
-    borderRadius: borderRadius.pill,
-    gap: spacing.sm,
-  },
-  alignedIcon: {
-    fontSize: 18,
-    color: colors.background.primary,
-    fontWeight: '700',
-  },
-  alignedText: {
-    fontSize: 16,
-    color: colors.background.primary,
+  alignedButtonText: {
+    fontSize: 17,
     fontWeight: '600',
+    color: colors.background.primary,
+  },
+  rotateButton: {
+    backgroundColor: colors.background.secondary,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 28,
+    marginTop: 24,
+  },
+  rotateButtonText: {
+    fontSize: 17,
+    fontWeight: '500',
+    color: colors.text.secondary,
   },
   bottomCard: {
     backgroundColor: colors.background.secondary,
@@ -479,6 +473,9 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.pill,
+  },
+  simulatorBannerActive: {
+    backgroundColor: colors.accent.primary,
   },
   simulatorText: {
     fontSize: 11,
