@@ -36,9 +36,6 @@ export const CompassScreen: React.FC<Props> = ({ route, navigation }) => {
   // Calibration guide state
   const [showCalibrationGuide, setShowCalibrationGuide] = useState(false);
 
-  // DEBUG: Force aligned state for screenshots
-  const [forceAligned, setForceAligned] = useState(false);
-
   // Pulse animation for aligned state
   const pulseScale = useSharedValue(1);
 
@@ -214,15 +211,15 @@ export const CompassScreen: React.FC<Props> = ({ route, navigation }) => {
           <Animated.View style={[styles.compassContainer, pulseAnimatedStyle]}>
             <Compass
               bearing={bearing}
-              deviceHeading={forceAligned ? bearing : deviceHeading}
-              isAligned={forceAligned || isAligned}
+              deviceHeading={deviceHeading}
+              isAligned={isAligned}
               showBearing={true}
               showCardinal={false}
             />
           </Animated.View>
 
           {/* Status Button */}
-          {forceAligned || isAligned ? (
+          {isAligned ? (
             <View style={styles.alignedButton}>
               <Text style={styles.alignedButtonText}>✓ Aligned</Text>
             </View>
@@ -297,17 +294,11 @@ export const CompassScreen: React.FC<Props> = ({ route, navigation }) => {
           isCalibrated={!needsCalibration}
         />
 
-        {/* Simulator Mode - Tap to toggle aligned state for screenshots */}
+        {/* Simulator Mode Indicator */}
         {isSimulatorMode && (
-          <TouchableOpacity
-            onPress={() => setForceAligned(!forceAligned)}
-            style={[styles.simulatorBanner, forceAligned && styles.simulatorBannerActive]}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.simulatorText}>
-              {forceAligned ? '✓ Aligned Mode (tap to reset)' : 'Simulator Mode (tap for aligned)'}
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.simulatorBanner}>
+            <Text style={styles.simulatorText}>Simulator Mode</Text>
+          </View>
         )}
       </SafeAreaView>
     </View>
@@ -473,9 +464,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.pill,
-  },
-  simulatorBannerActive: {
-    backgroundColor: colors.accent.primary,
   },
   simulatorText: {
     fontSize: 11,

@@ -14,7 +14,7 @@ import {
   Dimensions,
   ViewToken,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
 import { ScreenProps } from '../../navigation/types';
@@ -63,6 +63,7 @@ type Props = ScreenProps<'Onboarding'>;
 export const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
+  const insets = useSafeAreaInsets();
 
   // Track screen view on mount
   React.useEffect(() => {
@@ -149,7 +150,7 @@ export const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerSpacer} />
@@ -189,35 +190,31 @@ export const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
             />
           ))}
         </View>
+      </SafeAreaView>
 
-        {/* Bottom Buttons */}
-        <View style={styles.footer}>
-          {isLastSlide ? (
+      {/* Bottom Buttons - Outside SafeAreaView with manual padding */}
+      <View style={[styles.footer, { paddingBottom: insets.bottom + 24 }]}>
+        {isLastSlide ? (
+          <LinearGradient
+            colors={[colors.gradient.start, colors.gradient.end]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.getStartedButton}
+          >
             <TouchableOpacity
-              style={styles.primaryButton}
+              style={styles.getStartedTouchable}
               onPress={handleGetStarted}
               activeOpacity={0.8}
             >
-              <LinearGradient
-                colors={[colors.gradient.start, colors.gradient.end]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.primaryButtonGradient}
-              >
-                <Text style={styles.primaryButtonText}>Get Started</Text>
-              </LinearGradient>
+              <Text style={styles.getStartedText}>Get Started</Text>
             </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={handleNext}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.secondaryButtonText}>Continue</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </SafeAreaView>
+          </LinearGradient>
+        ) : (
+          <TouchableOpacity style={styles.secondaryButton} onPress={handleNext} activeOpacity={0.8}>
+            <Text style={styles.secondaryButtonText}>Continue</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 };
@@ -319,29 +316,26 @@ const styles = StyleSheet.create({
     width: 28,
   },
   footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xl,
-    minHeight: 80,
+    paddingTop: spacing.md,
   },
-  primaryButton: {
+  getStartedButton: {
     borderRadius: borderRadius.pill,
-    overflow: 'hidden',
-    backgroundColor: colors.accent.primary,
-    minHeight: 56,
+    height: 56,
   },
-  primaryButtonGradient: {
-    paddingVertical: spacing.lg,
+  getStartedTouchable: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 56,
   },
-  primaryButtonText: {
+  getStartedText: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#FFFFFF',
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    color: colors.background.primary,
   },
   secondaryButton: {
     backgroundColor: colors.background.secondary,
