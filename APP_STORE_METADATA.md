@@ -16,28 +16,27 @@ Face any location on Earth with real-time compass guidance. Simple and beautiful
 
 ### iOS App Store Description
 
-Ever wondered which way Mecca is? Curious about the direction to the Eiffel Tower from where you're standing? FaceIt makes global orientation simple and beautiful.
+Ever wondered which direction the Eiffel Tower is from where you're standing? Curious about facing the Taj Mahal or the Great Wall of China? FaceIt makes global orientation simple and beautiful.
 
 **How It Works**
 Simply search for any location on Earth, and FaceIt will guide you to face that direction using your device's compass. When you're aligned, you'll know it.
 
 **Key Features**
 
-- Real-time compass guidance with smooth 60fps animations
-- Search any location worldwide using Google Maps
-- Popular destinations at your fingertips (Mecca, Eiffel Tower, Taj Mahal, and more)
-- Save your favorite locations for quick access
-- Track your search history
-- Beautiful dark theme designed for clarity
-- Works offline once you've searched a location
+• Real-time compass guidance with smooth 60fps animations
+• Search any location worldwide using Google Maps
+• Popular destinations at your fingertips (Eiffel Tower, Taj Mahal, Statue of Liberty, and more)
+• Save your favorite locations for quick access
+• Track your search history
+• Beautiful dark theme designed for clarity
+• Works offline once you've searched a location
 
 **Perfect For**
 
-- Prayer direction (Qibla) finding
-- Geography education and learning
-- Travel planning and exploration
-- Curiosity about the world around you
-- Teaching kids about global geography
+• Travel planning and exploration
+• Geography education and learning
+• Curiosity about the world around you
+• Teaching kids about global geography
 
 **Privacy First**
 Your location data stays on your device. We don't track you, sell your data, or show ads.
@@ -49,27 +48,26 @@ No subscriptions, no ads, no hidden costs. Just a beautiful tool to connect you 
 
 ### Android Play Store Description
 
-Ever wondered which way Mecca is? Curious about the direction to the Eiffel Tower from where you're standing? FaceIt makes global orientation simple and beautiful.
+Ever wondered which direction the Eiffel Tower is from where you're standing? Curious about facing the Taj Mahal or the Great Wall of China? FaceIt makes global orientation simple and beautiful.
 
 HOW IT WORKS
 Simply search for any location on Earth, and FaceIt will guide you to face that direction using your device's compass. When you're aligned, you'll know it.
 
 KEY FEATURES
 
-- Real-time compass guidance with smooth animations
-- Search any location worldwide using Google Maps
-- Popular destinations at your fingertips
-- Save your favorite locations for quick access
-- Track your search history
-- Beautiful dark theme designed for clarity
-- Works offline once you've searched a location
+• Real-time compass guidance with smooth animations
+• Search any location worldwide using Google Maps
+• Popular destinations at your fingertips
+• Save your favorite locations for quick access
+• Track your search history
+• Beautiful dark theme designed for clarity
+• Works offline once you've searched a location
 
 PERFECT FOR
 
-- Prayer direction (Qibla) finding
-- Geography education and learning
-- Travel planning and exploration
-- Curiosity about the world around you
+• Travel planning and exploration
+• Geography education and learning
+• Curiosity about the world around you
 
 PRIVACY FIRST
 Your location data stays on your device. We don't track you, sell your data, or show ads.
@@ -79,7 +77,7 @@ Your location data stays on your device. We don't track you, sell your data, or 
 ## Keywords (iOS, 100 chars total)
 
 ```
-compass,qibla,prayer,direction,orientation,mecca,travel,geography,navigation,bearing
+compass,direction,orientation,travel,geography,navigation,bearing,landmarks,explore,world
 ```
 
 ## Category
