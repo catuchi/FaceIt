@@ -36,7 +36,7 @@ You agree to use FaceIt only for lawful purposes and in accordance with these Te
 
 - General orientation and curiosity
 - Educational purposes
-- Prayer direction finding (Qibla)
+- Prayer direction finding
 - Casual exploration and learning
 
 ### Accuracy Limitations

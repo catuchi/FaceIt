@@ -34,7 +34,7 @@ Or take manual screenshots with:
 | #   | Screen            | What to Show                                  |
 | --- | ----------------- | --------------------------------------------- |
 | 1   | Landing           | Search bar + Popular destinations grid        |
-| 2   | Search Results    | Results for "Eiffel Tower" or "Mecca"         |
+| 2   | Search Results    | Results for "Eiffel Tower" or "Tokyo Tower"   |
 | 3   | Compass (Active)  | Compass pointing to destination with distance |
 | 4   | Compass (Aligned) | Green "Aligned!" indicator visible            |
 | 5   | Settings          | Settings screen with preferences              |
@@ -67,6 +67,6 @@ screenshots/
 
 1. **Fresh state**: Clear app data before capturing
 2. **Sample data**: Add some searches to history first
-3. **Favorite**: Save Mecca as a favorite for the compass screen
+3. **Favorite**: Save a location as a favorite for the compass screen
 4. **Time**: iOS status bar time doesn't matter for App Store
 5. **Orientation**: Portrait only for phone screenshots

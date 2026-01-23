@@ -23,7 +23,7 @@ A beautiful, modern mobile application that helps users physically orient themse
 
 ### Use Cases
 
-- **Spiritual Practice**: Find accurate prayer direction (Qibla) from anywhere
+- **Prayer Direction**: Find accurate prayer direction from anywhere
 - **Travel & Exploration**: Understand spatial relationships between locations
 - **Emotional Connection**: Face toward distant loved ones
 - **Education**: Teach geography and spatial awareness

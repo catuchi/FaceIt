@@ -42,7 +42,7 @@ This guide provides specifications and instructions for capturing screenshots re
 
 ### 2. Search Results
 
-**What to show**: Results for a compelling search (e.g., "Eiffel Tower" or "Mecca")
+**What to show**: Results for a compelling search (e.g., "Eiffel Tower" or "Tokyo Tower")
 
 - Multiple results displayed
 - Location names and coordinates visible
@@ -55,7 +55,7 @@ This guide provides specifications and instructions for capturing screenshots re
 **What to show**: Compass pointing to a destination with bearing displayed
 
 - Compass dial with needle pointing toward target
-- Target name displayed (e.g., "Mecca" or "Eiffel Tower")
+- Target name displayed (e.g., "Tokyo Tower" or "Eiffel Tower")
 - Distance shown
 - Bearing degrees visible
 
@@ -162,13 +162,13 @@ Before capturing screenshots:
 
 **Recent Searches** (add via app):
 
-1. Mecca, Saudi Arabia
-2. Eiffel Tower, Paris
-3. Statue of Liberty, New York
+1. Eiffel Tower, Paris
+2. Statue of Liberty, New York
+3. Tokyo Tower, Japan
 
 **Favorite Location**:
 
-- Mecca (for Qibla use case appeal)
+- Home (for personal use case appeal)
 
 ---
 

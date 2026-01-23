@@ -26,7 +26,7 @@ export const MOCK_COORDINATES = {
   london: createMockCoordinates({ latitude: 51.5074, longitude: -0.1278 }),
   tokyo: createMockCoordinates({ latitude: 35.6762, longitude: 139.6503 }),
   sydney: createMockCoordinates({ latitude: -33.8688, longitude: 151.2093 }),
-  mecca: createMockCoordinates({ latitude: 21.4225, longitude: 39.8262 }),
+  paris: createMockCoordinates({ latitude: 48.8566, longitude: 2.3522 }),
   northPole: createMockCoordinates({ latitude: 90, longitude: 0 }),
   southPole: createMockCoordinates({ latitude: -90, longitude: 0 }),
   equator: createMockCoordinates({ latitude: 0, longitude: 0 }),
@@ -133,9 +133,9 @@ export const BEARING_TEST_CASES = [
   },
   {
     from: MOCK_COORDINATES.sydney,
-    to: MOCK_COORDINATES.mecca,
-    expectedBearing: 294, // Approximately WNW
-    description: 'Sydney to Mecca',
+    to: MOCK_COORDINATES.paris,
+    expectedBearing: 304, // Approximately NW
+    description: 'Sydney to Paris',
   },
 ];
 
