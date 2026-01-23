@@ -13,7 +13,7 @@
 - App store metadata written (APP_STORE_METADATA.md)
 - Screenshot guide created (SCREENSHOTS_GUIDE.md)
 - Production build configs ready (v1.0.0)
-- Bundle identifiers updated to `com.faceit.app` (iOS & Android)
+- Bundle identifiers updated to `io.faceit.compass` (iOS & Android)
 
 **Next tasks** (read `plan.md` for full details):
 

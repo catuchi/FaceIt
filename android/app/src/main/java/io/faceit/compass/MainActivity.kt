@@ -1,4 +1,4 @@
-package com.faceit.app
+package io.faceit.compass
 
 import android.os.Bundle
 import com.facebook.react.ReactActivity

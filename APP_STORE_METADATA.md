@@ -153,8 +153,8 @@ Same as iPhone screenshots
 
 ## Bundle Identifiers
 
-- **iOS**: `com.faceit.app`
-- **Android**: `com.faceit.app`
+- **iOS**: `io.faceit.compass`
+- **Android**: `io.faceit.compass`
 
 ## Version
 

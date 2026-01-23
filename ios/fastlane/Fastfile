@@ -15,7 +15,7 @@ platform :ios do
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-          "com.faceit.app" => "match AppStore com.faceit.app"
+          "io.faceit.compass" => "match AppStore io.faceit.compass"
         }
       }
     )

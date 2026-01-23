@@ -107,6 +107,9 @@ export function useCompass({
       setIsLoadingLocation(true);
       setLocationError(null);
 
+      // Request permission first (Android requires explicit request)
+      await locationServiceRef.current.requestPermission();
+
       const coords = await locationServiceRef.current.getCurrentLocation();
       setCurrentLocation(coords);
     } catch (error: any) {
